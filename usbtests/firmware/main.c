@@ -65,13 +65,16 @@ int main(void) {
 	int pupsko = 0;
 
 	while (1) {
+		PORTB=0x55;
 		wdt_reset();
 		usbPoll();
-		PORTB = pupsko;
+//		PORTB = pupsko;
 		_delay_ms(50);
-		pupsko++;
-		if (pupsko > 255)
-			pupsko = 0;
+		PORTB = 0xAA;
+		_delay_ms(50);
+//		pupsko++;
+//		if (pupsko > 255)
+//			pupsko = 0;
 	}
 
 	
