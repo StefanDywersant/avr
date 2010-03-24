@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 		libusb_get_string_descriptor_ascii(devhandle, desc.iManufacturer, manufacturer, sizeof(manufacturer));
 		libusb_get_string_descriptor_ascii(devhandle, desc.iProduct, product, sizeof(product));
 
-		printf("%d: (%d) vendor=%04x product=%04x bus=%d, device=%d manufacturer=%s product=%s\n", i, r, desc.idVendor, desc.idProduct, libusb_get_bus_number(dev), libusb_get_device_address(dev), manufacturer, product);
+		printf("%d: (%d) vendor=0x%04x (%d) product=0x%04x (%d) bus=%d device=%d manufacturer=%s product=%s\n", i, r, desc.idVendor, desc.idVendor, desc.idProduct, desc.idProduct, libusb_get_bus_number(dev), libusb_get_device_address(dev), manufacturer, product);
 
 
 
