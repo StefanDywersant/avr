@@ -23,15 +23,27 @@ int main(int argc, char** argv) {
 
 	for (i = 0; i < cnt; i++) {
 		struct libusb_device_descriptor desc;
+		libusb_device_handle* devhandle;
+		unsigned char manufacturer[256];
+		unsigned char product[256];
 
 		dev = devs[i];
 
 		int r = libusb_get_device_descriptor(dev, &desc);
-		printf("%d: (%d) vendor=%04x product=%04x bus=%d, device=%d\n", i, r, desc.idVendor, desc.idProduct, libusb_get_bus_number(dev), libusb_get_device_address(dev));
+
+		libusb_open(dev, &devhandle);
+
+		libusb_get_string_descriptor_ascii(devhandle, desc.iManufacturer, manufacturer, sizeof(manufacturer));
+		libusb_get_string_descriptor_ascii(devhandle, desc.iProduct, product, sizeof(product));
+
+		printf("%d: (%d) vendor=%04x product=%04x bus=%d, device=%d manufacturer=%s product=%s\n", i, r, desc.idVendor, desc.idProduct, libusb_get_bus_number(dev), libusb_get_device_address(dev), manufacturer, product);
 
 
 
+
+		libusb_close(devhandle);
 	}
 
 	libusb_exit(NULL);
+	return 0;
 }
