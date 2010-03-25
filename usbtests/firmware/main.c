@@ -4,7 +4,7 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include "usbdrv.h"
-#include "oddebug.h"
+//#include "oddebug.h"
 
 PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must match usbconfig.h */
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
@@ -36,8 +36,32 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
     0xC0,                          // END COLLECTION
 };
 
+static char led = 0xff;
+
 usbMsgLen_t usbFunctionSetup(uchar data[8]) {
+	usbRequest_t* request = (usbRequest_t *)data;
+
+	if (request->bRequest == 0x04) {
+		led = 0x00;
+		return USB_NO_MSG;
+	}
+
     return 0;
+}
+
+uchar usbFunctionRead(uchar *data, uchar len) {
+	led=data[0];
+
+	return len;
+}
+
+uchar usbFunctionWrite(uchar *data, uchar len) {
+	unsigned int i;
+
+	for (i = 0; i < len; i++)
+		led = data[i];
+
+	return len;
 }
 
 int main(void) {
@@ -45,9 +69,9 @@ int main(void) {
 
 	wdt_enable(WDTO_1S);
 
-	DBG1(0x00, 0, 0);
+//	DBG1(0x00, 0, 0);
 
-	odDebugInit();	
+//	odDebugInit();
 	usbInit();
 	
 	usbDeviceDisconnect();
@@ -60,21 +84,12 @@ int main(void) {
 	usbDeviceConnect();
 	sei();
 
-	DBG1(0x01, 0, 0);
-
-	int pupsko = 0;
+//	DBG1(0x01, 0, 0);
 
 	while (1) {
-		PORTB=0x55;
 		wdt_reset();
 		usbPoll();
-//		PORTB = pupsko;
-		_delay_ms(50);
-		PORTB = 0xAA;
-		_delay_ms(50);
-//		pupsko++;
-//		if (pupsko > 255)
-//			pupsko = 0;
+		PORTB = led;
 	}
 
 	
