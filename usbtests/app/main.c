@@ -68,6 +68,7 @@ int get_device(libusb_device_handle** handle) {
 			continue;
 		}
 
+		// device found
 		printf("Device found at %04d:%04d\n", libusb_get_bus_number(devs[i]), libusb_get_device_address(devs[i]));
 		printf("Device info: %s / %s [%04x:%04x]\n", manufacturer, product, descriptor.idVendor, descriptor.idProduct);
 
@@ -76,6 +77,7 @@ int get_device(libusb_device_handle** handle) {
 		return 0;
 	}
 
+	// device not found
 	libusb_free_device_list(devs, devices_count);
 	return -1;
 }
@@ -89,6 +91,23 @@ int main(int argc, char** argv) {
 		printf("Unable to find device!\n");
 		return 0;
 	}
+
+	if (argc != 2) {
+		printf("Wrong parameter count");
+		return 0;
+	}
+
+	unsigned int data[1];
+	if (sscanf(argv[1], "0x%02x", data) == 0) {
+		printf("Invalid hex value");
+		return 0;
+	}
+
+	printf("%d\n", *data);
+
+	int ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT, 0x04, 0 ,0, (unsigned char *)data, 1, 10000);
+
+	printf("Error: %d\n", ret);
 
 	libusb_close(handle);
 
