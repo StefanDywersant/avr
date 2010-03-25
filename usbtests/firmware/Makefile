@@ -33,7 +33,7 @@ fuse:
 rflash:
 	ssh $(REMOTE_HOST) "mkdir -p $(REMOTE_DIR)" || exit 1
 	rsync --rsh=ssh -r *  $(REMOTE_HOST):$(REMOTE_DIR) || exit 1
-	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR); make flash" || exit 1
+	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR); make clean flash" || exit 1
 	ssh $(REMOTE_HOST) "rm -rf $(REMOTE_DIR)" || exit 1
 
 # rule for uploading firmware:
