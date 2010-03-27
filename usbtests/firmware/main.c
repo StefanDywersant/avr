@@ -6,6 +6,8 @@
 #include "usbdrv.h"
 //#include "oddebug.h"
 
+#define SCL_CLOCK 100000L
+
 PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must match usbconfig.h */
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x02,                    // USAGE (Mouse)
@@ -38,6 +40,131 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
 
 static char led = 0xff;
 
+void twiPlayground() {
+	// send start condition
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	led = 0x01;
+
+	// wait for TWINT flag set
+	while (!(TWCR & (1 << TWINT)));
+	led = 0x02;
+
+	// check value of TWI status register
+	if ((TWSR & 0xf8) != 0x08) {
+//		led = TWSR;
+		led = 0xff;
+		TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+		return;
+	}
+	led = 0x03;
+
+	// send address
+	TWDR = 0xa0 | 0x00;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	led = 0x04;
+
+	// wait for TWINT flag set
+	while (!(TWCR & (1 << TWINT)));
+	led = 0x05;
+
+	// check value of TWI status register
+	if ((TWSR & 0xf8) != 0x18) {
+//		led = TWSR;
+		led = 0xfe;
+		TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+		return;
+	}
+	led = 0x06;
+
+	// load data into TWDR register
+	TWDR = 0x02;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	led = 0x07;
+
+	// wait for TWINT flag set
+	while (!(TWCR & (1 << TWINT)));
+	led = 0x08;
+
+	// check value of TWI status register
+	if ((TWSR & 0xf8) != 0x28) {
+//		led = TWSR;
+		led = 0xfd;
+		TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+		return;
+	}
+	led = 0x09;
+
+	// *********
+
+	// send start condition
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	led = 0x0a;
+
+	// wait for TWINT flag set
+	while (!(TWCR & (1 << TWINT)));
+	led = 0x0b;
+
+	// check value of TWI status register
+	if ((TWSR & 0xf8) != 0x10) {
+//		led = TWSR;
+		led = 0xfc;
+		TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+		return;
+	}
+	led = 0x0c;
+
+	// send address
+	TWDR = 0xa0 | 0x01;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	led = 0x0d;
+
+	// wait for TWINT flag set
+	while (!(TWCR & (1 << TWINT)));
+	led = 0x0e;
+
+	// check value of TWI status register
+	if ((TWSR & 0xf8) != 0x40) {
+//		led = TWSR;
+		led = 0xfb;
+		TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+		return;
+	}
+	led = 0x0f;
+
+	// load data into TWDR register
+	TWDR = 0x02;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	led = 0x10;
+
+	// wait for TWINT flag set
+	while (!(TWCR & (1 << TWINT)));
+	led = 0x11;
+
+	// check value of TWI status register
+	if ((TWSR & 0xf8) != 0x28) {
+//		led = TWSR;
+//		led = 0xfa;
+		led = TWDR;
+		TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+		return;
+	}
+	led = 0x12;
+
+	// transmit stop condition
+	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+	led = 0x13;
+}
+
+void executeCommand(uchar command) {
+	switch (command) {
+		case 0x00:
+			twiPlayground();
+			break;
+		default:
+			led = command;
+	}
+}
+
 usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 	usbRequest_t* request = (usbRequest_t *)data;
 
@@ -59,15 +186,20 @@ uchar usbFunctionWrite(uchar *data, uchar len) {
 	unsigned int i;
 
 	for (i = 0; i < len; i++)
-		led = data[i];
+		executeCommand(data[i]);
 
 	return len;
 }
 
 int main(void) {
 	DDRB = 0xFF;
+	PORTC = 0x03;
 
-	wdt_enable(WDTO_1S);
+	TWSR = 0x00;
+	TWBR = ((F_CPU / SCL_CLOCK) - 16) / 2;
+	TWCR = (1 << TWEN) | (1 << TWIE);
+
+//	wdt_enable(WDTO_1S);
 
 //	DBG1(0x00, 0, 0);
 
@@ -77,7 +209,7 @@ int main(void) {
 	usbDeviceDisconnect();
 	uchar i = 0;
 	while (--i) {
-		wdt_reset();
+//		wdt_reset();
 		_delay_ms(1);
 	}
 	
@@ -87,7 +219,7 @@ int main(void) {
 //	DBG1(0x01, 0, 0);
 
 	while (1) {
-		wdt_reset();
+//		wdt_reset();
 		usbPoll();
 		PORTB = led;
 	}
