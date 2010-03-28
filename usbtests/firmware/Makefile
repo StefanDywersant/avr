@@ -8,7 +8,7 @@ REMOTE_HOST = twarzromana.czystybeton.pl
 REMOTE_DIR = __avr
 
 CFLAGS  = -Iusbdrv -I. -DDEBUG_LEVEL=0
-OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o main.o
+OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o main.o twi.o pcf8583.o
 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
 
@@ -20,7 +20,7 @@ help:
 	@echo "make flash ..... to flash the firmware (use this on metaboard)"
 	@echo "make clean ..... to delete objects and hex file"
 
-hex: main.hex
+hex: firmware.hex
 
 program: flash fuse
 
@@ -37,12 +37,12 @@ rflash:
 	ssh $(REMOTE_HOST) "rm -rf $(REMOTE_DIR)" || exit 1
 
 # rule for uploading firmware:
-flash: main.hex
-	$(AVRDUDE) -U flash:w:main.hex:i
+flash: firmware.hex
+	$(AVRDUDE) -U flash:w:firmware.hex:i
 
 # rule for deleting dependent files (those which can be built by Make):
 clean:
-	rm -f main.hex main.lst main.obj main.cof main.list main.map main.eep.hex main.elf *.o usbdrv/*.o main.s usbdrv/oddebug.s usbdrv/usbdrv.s
+	rm -f *.elf *.hex $(OBJECTS)
 
 # Generic rule for compiling C files:
 .c.o:
@@ -62,18 +62,18 @@ clean:
 
 # file targets:
 
-main.elf: $(OBJECTS)
-	$(COMPILE) -o main.elf $(OBJECTS)
+firmware.elf: $(OBJECTS)
+	$(COMPILE) -o firmware.elf $(OBJECTS)
 
-main.hex: main.elf
-	rm -f main.hex main.eep.hex
-	avr-objcopy -j .text -j .data -O ihex main.elf main.hex
-	avr-size main.hex
+firmware.hex: firmware.elf
+	rm -f firmware.hex firmware.eep.hex
+	avr-objcopy -j .text -j .data -O ihex firmware.elf firmware.hex
+	avr-size firmware.hex
 
 # debugging targets:
 
-disasm:	main.elf
-	avr-objdump -d main.elf
+disasm:	firmware.elf
+	avr-objdump -d firmware.elf
 
 cpp:
 	$(COMPILE) -E main.c
