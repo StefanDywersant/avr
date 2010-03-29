@@ -23,7 +23,7 @@ typedef struct {
 	uint8_t hour;
 } pcf8583TimeStruct;
 
-uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct** time);
+uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct* time);
 
 
 #endif /* PCF8583_H_ */

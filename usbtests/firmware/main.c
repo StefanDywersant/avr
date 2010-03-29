@@ -39,6 +39,8 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
 };
 
 static char led = 0xff;
+static pcf8583TimeStruct time;
+
 
 void twiPlayground() {
 /*	uint8_t request[1];
@@ -53,16 +55,10 @@ void twiPlayground() {
 }
 
 void readSecond() {
-	pcf8583TimeStruct* _time;
-
-	if (pcf8583GetTime(0xa0, &_time) != PCF8583_OK) {
+	if (pcf8583GetTime(0xa0, &time) != PCF8583_OK) {
 		led = 0xaa;
 		return;
 	}
-
-	led = _time->second;
-
-	free(_time);
 }
 
 void executeCommand(uchar command) {
@@ -80,12 +76,6 @@ void executeCommand(uchar command) {
 
 usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 	usbRequest_t* request = (usbRequest_t *)data;
-	pcf8583TimeStruct* time;
-
-	if (pcf8583GetTime(0xa0, &time) != PCF8583_OK) {
-		led = 0xaa;
-		return 0;
-	}
 
 	if (request->bRequest == 0x04) {
 //		led = 0x00;
@@ -96,9 +86,12 @@ usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 }
 
 uchar usbFunctionRead(uchar *data, uchar len) {
-	data[0] = 0xff;
+	data[0] = time.milisecond;
+	data[1] = time.second;
+	data[2] = time.minute;
+	data[3] = time.hour;
 
-	return len;
+	return 4;
 }
 
 uchar usbFunctionWrite(uchar *data, uchar len) {
@@ -112,19 +105,9 @@ uchar usbFunctionWrite(uchar *data, uchar len) {
 
 int main(void) {
 	DDRB = 0xFF;
-//	PORTC = 0x03;
 
 	twiInit(100000);
 
-//	TWSR = 0x00;
-//	TWBR = ((F_CPU / SCL_CLOCK) - 16) / 2;
-//	TWCR = (1 << TWEN) | (1 << TWIE);
-
-//	wdt_enable(WDTO_1S);
-
-//	DBG1(0x00, 0, 0);
-
-//	odDebugInit();
 	usbInit();
 	
 	usbDeviceDisconnect();
