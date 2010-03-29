@@ -5,7 +5,8 @@
  *      Author: kharg
  */
 
-#include <pcf8583.h>
+#include <stdlib.h>
+#include "pcf8583.h"
 
 #define PCF8583_ADDR_CRSR 0x00
 #define PCF8583_ADDR_MILISECOND 0x01
@@ -13,34 +14,37 @@
 #define PCF8583_ADDR_MINUTE 0x03
 #define PCF8583_ADDR_HOUR 0x04
 
-uint8_t pcf8583GetTime(uint8_t a0, pcf8583TimeStruct* time) {
-	uint8_t request[1];
-	uint8_t response[1];
+uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct** time) {
+	uint8_t type;
+	pcf8583TimeStruct* _time;
+
+	_time = malloc(sizeof(pcf8583TimeStruct));
 
 	// milisecond
-	*request = PCF8583_ADDR_MILISECOND;
-	if (twiSyncMTMR(PCF8583_ADDR | a0, request, 1, response, 1) != TWI_OK)
-		return PCF8583_ERROR;
-	time->milisecond = (response[0] >> 4) * 0x0a + (response[0] & 0x0f);
+	type = PCF8583_ADDR_MILISECOND;
+	if (twiSyncMTMR(addr, &type, 1, &_time->milisecond, 1) != TWI_OK)
+		return 0xfe;
+	_time->milisecond = (_time->milisecond >> 4) * 0x0a + (_time->milisecond & 0x0f);
 
 	// second
-	*request = PCF8583_ADDR_SECOND;
-	if (twiSyncMTMR(PCF8583_ADDR | a0, request, 1, response, 1) != TWI_OK)
-		return PCF8583_ERROR;
-	time->second = (response[0] >> 4) * 0x0a + (response[0] & 0x0f);
+	type = PCF8583_ADDR_SECOND;
+	if (twiSyncMTMR(addr, &type, 1, &_time->second, 1) != TWI_OK)
+		return 0xfd;
+	_time->second = (_time->second >> 4) * 0x0a + (_time->second & 0x0f);
 
 	// minute
-	*request = PCF8583_ADDR_MINUTE;
-	if (twiSyncMTMR(PCF8583_ADDR | a0, request, 1, response, 1) != TWI_OK)
+	type = PCF8583_ADDR_MINUTE;
+	if (twiSyncMTMR(addr, &type, 1, &_time->minute, 1) != TWI_OK)
 		return PCF8583_ERROR;
-	time->minute = (response[0] >> 4) * 0x0a + (response[0] & 0x0f);
+	_time->minute = (_time->minute >> 4) * 0x0a + (_time->minute & 0x0f);
 
 	// hour
-	*request = PCF8583_ADDR_HOUR;
-	if (twiSyncMTMR(PCF8583_ADDR | a0, request, 1, response, 1) != TWI_OK)
+	type = PCF8583_ADDR_HOUR;
+	if (twiSyncMTMR(addr, &type, 1, &_time->hour, 1) != TWI_OK)
 		return PCF8583_ERROR;
-	time->hour = (response[0] >> 4) * 0x0a + (response[0] & 0x0f);
+	_time->hour = (_time->hour >> 4) * 0x0a + (_time->hour & 0x0f);
+
+	*time = _time;
 
 	return PCF8583_OK;
 }
-

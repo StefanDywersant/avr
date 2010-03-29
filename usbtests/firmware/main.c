@@ -1,8 +1,9 @@
+#include <stdlib.h>
 #include <avr/io.h>
-#include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
+#include <util/delay.h>
 #include "pcf8583.h"
 #include "twi.h"
 #include "usbdrv.h"
@@ -52,14 +53,16 @@ void twiPlayground() {
 }
 
 void readSecond() {
-	pcf8583TimeStruct time;
+	pcf8583TimeStruct* _time;
 
-	if (pcf8583GetTime(0, &time) != PCF8583_OK) {
+	if (pcf8583GetTime(0xa0, &_time) != PCF8583_OK) {
 		led = 0xaa;
 		return;
 	}
 
-	led = time.second;
+	led = _time->second;
+
+	free(_time);
 }
 
 void executeCommand(uchar command) {
@@ -77,6 +80,12 @@ void executeCommand(uchar command) {
 
 usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 	usbRequest_t* request = (usbRequest_t *)data;
+	pcf8583TimeStruct* time;
+
+	if (pcf8583GetTime(0xa0, &time) != PCF8583_OK) {
+		led = 0xaa;
+		return 0;
+	}
 
 	if (request->bRequest == 0x04) {
 //		led = 0x00;
@@ -87,7 +96,7 @@ usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 }
 
 uchar usbFunctionRead(uchar *data, uchar len) {
-//	led=data[0];
+	data[0] = 0xff;
 
 	return len;
 }

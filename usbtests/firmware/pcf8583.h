@@ -11,7 +11,8 @@
 #include <stdint.h>
 #include "twi.h"
 
-#define PCF8583_ADDR 0xa0
+#define PCF8583_ADDR_0 0xa0
+#define PCF8583_ADDR_1 0xa1
 #define PCF8583_OK 0x00
 #define PCF8583_ERROR 0x01
 
@@ -22,7 +23,7 @@ typedef struct {
 	uint8_t hour;
 } pcf8583TimeStruct;
 
-uint8_t pcf8583GetTime(uint8_t a0, pcf8583TimeStruct* time);
+uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct** time);
 
 
 #endif /* PCF8583_H_ */
