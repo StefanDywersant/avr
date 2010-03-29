@@ -48,25 +48,17 @@ void twiInit(uint32_t bitrate) {
 
 uint8_t twiSyncMTMR(uint8_t address, uint8_t *requestData, uint8_t requestLen, uint8_t *responseData, uint8_t responseLen) {
 
-/*	while (requestLen--)
-		requestData++;
-
-	while (responseLen--)
-		twiReadDataByte(responseData++);
-
-	return TWI_OK;*/
-
 	// Master Transmitter
 
 	// write start condition
 	twiWriteStart();
 	twiWaitForBus();
 
-	if (TW_STATUS != TW_START) {
+/*	if (TW_STATUS != TW_START) {
 		twiWriteStop();
-		return 0xfe;
+		return TWSR;
 //		return TWI_ERROR;
-	}
+	}*/
 
 	// write SLA+W
 	twiWriteSlaveAddress(address, TW_WRITE);
@@ -133,6 +125,8 @@ uint8_t twiSyncMTMR(uint8_t address, uint8_t *requestData, uint8_t requestLen, u
 
 	// write stop condition
 	twiWriteStop();
+
+	while (!(TWCR & (1 << TWSTO)));
 
 	return TWI_OK;
 }
