@@ -25,9 +25,9 @@ typedef struct {
 	uint8_t month;
 	uint8_t year;
 	uint8_t weekday;
-} pcf8583TimeStruct;
+} pcf8583DateTimeStruct;
 
-uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct* time);
+uint8_t pcf8583GetDateTime(uint8_t addr, pcf8583DateTimeStruct* time);
 
 
 #endif /* PCF8583_H_ */
