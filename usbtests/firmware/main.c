@@ -90,8 +90,12 @@ uchar usbFunctionRead(uchar *data, uchar len) {
 	data[1] = time.second;
 	data[2] = time.minute;
 	data[3] = time.hour;
+	data[4] = time.date;
+	data[5] = time.month;
+	data[6] = time.year;
+	data[7] = time.weekday;
 
-	return 4;
+	return 8;
 }
 
 uchar usbFunctionWrite(uchar *data, uchar len) {

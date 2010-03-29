@@ -13,6 +13,8 @@
 #define PCF8583_ADDR_SECOND 0x02
 #define PCF8583_ADDR_MINUTE 0x03
 #define PCF8583_ADDR_HOUR 0x04
+#define PCF8583_ADDR_YEAR_DATE 0x05
+#define PCF8583_ADDR_WEEKDAY_MONTH 0x06
 
 uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct* time) {
 	uint8_t type;
@@ -40,6 +42,21 @@ uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct* time) {
 	if (twiSyncMTMR(addr, &type, 1, &time->hour, 1) != TWI_OK)
 		return PCF8583_ERROR;
 	time->hour = (time->hour >> 4) * 0x0a + (time->hour & 0x0f);
+
+	// year/date
+	type = PCF8583_ADDR_YEAR_DATE;
+	uint8_t buf;
+	if (twiSyncMTMR(addr, &type, 1, &buf, 1) != TWI_OK)
+		return PCF8583_ERROR;
+	time->year = buf & 0xf0;
+	time->date = buf & 0x0f;
+
+	// year/date
+	type = PCF8583_ADDR_WEEKDAY_MONTH;
+	if (twiSyncMTMR(addr, &type, 1, &buf, 1) != TWI_OK)
+		return PCF8583_ERROR;
+	time->weekday = buf & 0xf0;
+	time->month = buf & 0x0f;
 
 	return PCF8583_OK;
 }
