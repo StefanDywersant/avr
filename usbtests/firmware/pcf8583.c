@@ -16,7 +16,7 @@
 #define PCF8583_ADDR_YEAR_DATE 0x05
 #define PCF8583_ADDR_WEEKDAY_MONTH 0x06
 
-uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct* time) {
+uint8_t pcf8583GetDateTime(uint8_t addr, pcf8583DateTimeStruct* time) {
 	uint8_t type;
 
 	// milisecond

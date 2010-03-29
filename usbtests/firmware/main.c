@@ -39,7 +39,7 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
 };
 
 static char led = 0xff;
-static pcf8583TimeStruct time;
+static pcf8583DateTimeStruct time;
 
 
 void twiPlayground() {
@@ -55,7 +55,7 @@ void twiPlayground() {
 }
 
 void readSecond() {
-	if (pcf8583GetTime(0xa0, &time) != PCF8583_OK) {
+	if (pcf8583GetDateTime(0xa0, &time) != PCF8583_OK) {
 		led = 0xaa;
 		return;
 	}
