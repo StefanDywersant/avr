@@ -109,10 +109,10 @@ int main(int argc, char** argv) {
 
 	printf("Write: %d\n", ret);
 
-	unsigned char data[4];
-	ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN, 0x04, 0 ,0, data, 4, 10000);
+	unsigned char data[8];
+	ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN, 0x04, 0 ,0, data, 8, 10000);
 
-	printf("Read: %d (%02d:%02d:%02d.%02d)\n", ret, data[3], data[2], data[1], data[0]);
+	printf("Read: %d (%d, %04d/%02d/%02d %02d:%02d:%02d.%02d)\n", ret, data[7], data[6], data[5], data[4], data[3], data[2], data[1], data[0]);
 
 	libusb_close(handle);
 
