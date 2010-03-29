@@ -21,6 +21,10 @@ typedef struct {
 	uint8_t second;
 	uint8_t minute;
 	uint8_t hour;
+	uint8_t date;
+	uint8_t month;
+	uint8_t year;
+	uint8_t weekday;
 } pcf8583TimeStruct;
 
 uint8_t pcf8583GetTime(uint8_t addr, pcf8583TimeStruct* time);
