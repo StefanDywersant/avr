@@ -93,21 +93,26 @@ int main(int argc, char** argv) {
 	}
 
 	if (argc != 2) {
-		printf("Wrong parameter count");
+		printf("Wrong parameter count\n");
 		return 0;
 	}
 
-	unsigned int data[1];
-	if (sscanf(argv[1], "0x%02x", data) == 0) {
-		printf("Invalid hex value");
+	unsigned int reqType[1];
+	if (sscanf(argv[1], "0x%02x", reqType) == 0) {
+		printf("Invalid hex value\n");
 		return 0;
 	}
 
-	printf("%d\n", *data);
+	printf("%d\n", reqType[0]);
 
-	int ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT, 0x04, 0 ,0, (unsigned char *)data, 1, 10000);
+	int ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT, 0x04, 0 ,0, (unsigned char*)reqType, 1, 10000);
 
-	printf("Error: %d\n", ret);
+	printf("Write: %d\n", ret);
+
+	unsigned char data[4];
+	ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN, 0x04, 0 ,0, data, 4, 10000);
+
+	printf("Read: %d (%02d:%02d:%02d.%02d)\n", ret, data[3], data[2], data[1], data[0]);
 
 	libusb_close(handle);
 
