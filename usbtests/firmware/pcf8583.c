@@ -22,13 +22,13 @@ uint8_t pcf8583GetDateTime(uint8_t addr, pcf8583DateTimeStruct* time) {
 	// milisecond
 	type = PCF8583_ADDR_MILISECOND;
 	if (twiSyncMTMR(addr, &type, 1, &time->milisecond, 1) != TWI_OK)
-		return 0xfe;
+		return PCF8583_ERROR;
 	time->milisecond = (time->milisecond >> 4) * 0x0a + (time->milisecond & 0x0f);
 
 	// second
 	type = PCF8583_ADDR_SECOND;
 	if (twiSyncMTMR(addr, &type, 1, &time->second, 1) != TWI_OK)
-		return 0xfd;
+		return PCF8583_ERROR;
 	time->second = (time->second >> 4) * 0x0a + (time->second & 0x0f);
 
 	// minute
@@ -48,15 +48,36 @@ uint8_t pcf8583GetDateTime(uint8_t addr, pcf8583DateTimeStruct* time) {
 	uint8_t buf;
 	if (twiSyncMTMR(addr, &type, 1, &buf, 1) != TWI_OK)
 		return PCF8583_ERROR;
-	time->year = buf & 0xf0;
-	time->date = buf & 0x0f;
+	time->year = buf >> 6; // 0 - 3
+	time->date = ((buf & 0x30) >> 4) * 0x0a + (buf & 0x0f); // 0 - 31
 
-	// year/date
+	// weekday/month
 	type = PCF8583_ADDR_WEEKDAY_MONTH;
 	if (twiSyncMTMR(addr, &type, 1, &buf, 1) != TWI_OK)
 		return PCF8583_ERROR;
-	time->weekday = buf & 0xf0;
-	time->month = buf & 0x0f;
+	time->weekday = buf >> 5; // 0 - 6
+	time->month = ((buf & 0x10) >> 4) * 0x0a + (buf & 0x0f); // 1 - 12
 
 	return PCF8583_OK;
+}
+
+uint8_t pcf8583SetDateTime(uint8_t addr, pcf8583DateTimeStruct* time) {
+	uint8_t request[7];
+
+	request[0] = 0x01;
+	request[1] = ((time->milisecond / 0xa) << 4) | (time->milisecond - (time->milisecond / 0xa) * 0xa);
+	request[2] = ((time->second / 0xa) << 4) | (time->second - (time->second / 0xa) * 0xa);
+	request[3] = ((time->minute / 0xa) << 4) | (time->minute - (time->minute / 0xa) * 0xa);
+	request[4] = ((time->hour / 0xa) << 4) | (time->hour - (time->hour / 0xa) * 0xa);
+	request[5] = (time->year << 6) | ((time->date / 0xa) << 4) | (time->date - (time->date / 0xa) * 0xa);
+	request[6] = (time->weekday << 5) | ((time->month / 0xa) << 4) | (time->month - (time->month / 0xa) * 0xa);
+
+	if (twiSyncMT(addr, request, 7) != TWI_OK)
+		return PCF8583_ERROR;
+
+	return PCF8583_OK;
+}
+
+pcf8583DateTimeStruct* pcf8583NewDateTimeStruct() {
+	return (pcf8583DateTimeStruct*)malloc(sizeof(pcf8583DateTimeStruct));
 }

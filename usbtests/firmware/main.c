@@ -61,6 +61,25 @@ void readSecond() {
 	}
 }
 
+void writeMinute() {
+	pcf8583DateTimeStruct* _time = pcf8583NewDateTimeStruct();
+	_time->milisecond = 0x00;
+	_time->second = 0x00;
+	_time->minute = 0x00;
+	_time->hour = 0x00;
+	_time->date = 0x01;
+	_time->month = 0x0b;
+	_time->year = 0x02;
+	_time->weekday = 0x01;
+
+	if (pcf8583SetDateTime(0xa0, _time) != PCF8583_OK) {
+		led = 0x55;
+		return;
+	}
+
+	free(_time);
+}
+
 void executeCommand(uchar command) {
 	switch (command) {
 		case 0x00:
@@ -68,6 +87,9 @@ void executeCommand(uchar command) {
 			break;
 		case 0x01:
 			readSecond();
+			break;
+		case 0x02:
+			writeMinute();
 			break;
 		default:
 			led = command;
