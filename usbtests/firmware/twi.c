@@ -46,19 +46,10 @@ void twiInit(uint32_t bitrate) {
 	TWBR = ((F_CPU / bitrate) - 16) / 2;
 }
 
-uint8_t twiSyncMTMR(uint8_t address, uint8_t *requestData, uint8_t requestLen, uint8_t *responseData, uint8_t responseLen) {
-
-	// Master Transmitter
-
+uint8_t twiSyncMT(uint8_t address, uint8_t *requestData, uint8_t requestLen) {
 	// write start condition
 	twiWriteStart();
 	twiWaitForBus();
-
-/*	if (TW_STATUS != TW_START) {
-		twiWriteStop();
-		return TWSR;
-//		return TWI_ERROR;
-	}*/
 
 	// write SLA+W
 	twiWriteSlaveAddress(address, TW_WRITE);
@@ -66,8 +57,7 @@ uint8_t twiSyncMTMR(uint8_t address, uint8_t *requestData, uint8_t requestLen, u
 
 	if (TW_STATUS != TW_MT_SLA_ACK) {
 		twiWriteStop();
-		return 0xfd;
-//		return TWI_ERROR;
+		return TWI_ERROR;
 	}
 
 	// write request data
@@ -77,8 +67,43 @@ uint8_t twiSyncMTMR(uint8_t address, uint8_t *requestData, uint8_t requestLen, u
 
 		if (TW_STATUS != TW_MT_DATA_ACK) {
 			twiWriteStop();
-			return 0xfc;
-	//		return TWI_ERROR;
+			return TWI_ERROR;
+		}
+	}
+
+	// write stop condition
+	twiWriteStop();
+
+	while (!(TWCR & (1 << TWSTO)));
+
+	return TWI_OK;
+}
+
+uint8_t twiSyncMTMR(uint8_t address, uint8_t *requestData, uint8_t requestLen, uint8_t *responseData, uint8_t responseLen) {
+
+	// Master Transmitter
+
+	// write start condition
+	twiWriteStart();
+	twiWaitForBus();
+
+	// write SLA+W
+	twiWriteSlaveAddress(address, TW_WRITE);
+	twiWaitForBus();
+
+	if (TW_STATUS != TW_MT_SLA_ACK) {
+		twiWriteStop();
+		return TWI_ERROR;
+	}
+
+	// write request data
+	while (requestLen--) {
+		twiWriteDataByte(*requestData++);
+		twiWaitForBus();
+
+		if (TW_STATUS != TW_MT_DATA_ACK) {
+			twiWriteStop();
+			return TWI_ERROR;
 		}
 	}
 
