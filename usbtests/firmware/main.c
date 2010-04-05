@@ -4,6 +4,7 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <util/delay.h>
+#include "owi.h"
 #include "pcf8583.h"
 #include "twi.h"
 #include "usbdrv.h"
@@ -40,7 +41,7 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
 
 static char led = 0xff;
 static pcf8583DateTimeStruct time;
-
+static uint8_t buf[9];
 
 void twiPlayground() {
 /*	uint8_t request[1];
@@ -80,6 +81,27 @@ void writeMinute() {
 	free(_time);
 }
 
+void owiPlayground() {
+	uint8_t x = OwiInit();
+	led = x;
+
+	OwiWriteByte(0xcc);
+
+	OwiWriteByte(0xbe);
+
+	uint8_t i = 0;
+	for (i = 0; i < 9; i++)
+		buf[i] = OwiReadByte();
+
+	OwiInit();
+
+	OwiWriteByte(0xcc);
+
+	OwiWriteByte(0x44);
+
+	led = buf[0];
+}
+
 void executeCommand(uchar command) {
 	switch (command) {
 		case 0x00:
@@ -90,6 +112,9 @@ void executeCommand(uchar command) {
 			break;
 		case 0x02:
 			writeMinute();
+			break;
+		case 0x03:
+			owiPlayground();
 			break;
 		default:
 			led = command;
@@ -108,7 +133,7 @@ usbMsgLen_t usbFunctionSetup(uchar data[8]) {
 }
 
 uchar usbFunctionRead(uchar *data, uchar len) {
-	data[0] = time.milisecond;
+/*	data[0] = time.milisecond;
 	data[1] = time.second;
 	data[2] = time.minute;
 	data[3] = time.hour;
@@ -117,7 +142,14 @@ uchar usbFunctionRead(uchar *data, uchar len) {
 	data[6] = time.year;
 	data[7] = time.weekday;
 
-	return 8;
+	return 8;*/
+
+	uint8_t i = 0;
+
+	for (i = 0; i < 2; i++)
+		data[i] = buf[i];
+
+	return 2;
 }
 
 uchar usbFunctionWrite(uchar *data, uchar len) {
