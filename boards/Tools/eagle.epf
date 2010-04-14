@@ -1,0 +1,24 @@
+[Eagle]
+Version="05 08 00"
+Platform="Linux"
+Serial="62191E841E-LSR-WLM-1EL"
+Globals="Globals"
+Desktop="Desktop"
+
+[Globals]
+AutoSaveProject=1
+UsedLibrary="/opt/eagle-5.8.0/lbr/rcl.lbr"
+UsedLibrary="/opt/eagle-5.8.0/lbr/diode.lbr"
+UsedLibrary="/opt/eagle-5.8.0/lbr/led.lbr"
+UsedLibrary="/opt/eagle-5.8.0/lbr/led-citizen-electronics.lbr"
+UsedLibrary="/opt/eagle-5.8.0/lbr/led-lumiled.lbr"
+
+[Win_1]
+Type="Control Panel"
+Loc="130 142 729 541"
+State=1
+Number=0
+
+[Desktop]
+Screen="1680 1050"
+Window="Win_1"
