@@ -8,7 +8,7 @@ REMOTE_HOST = twarzromana.czystybeton.pl
 REMOTE_DIR = __avr
 
 CFLAGS  = -Iusbdrv -I. -DDEBUG_LEVEL=0
-OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o main.o twi.o pcf8583.o owi.o
+OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o main.o twi.o pcf8583.o owi.o usart.o spi.o
 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
 
@@ -30,15 +30,26 @@ fuse:
 		{ echo "*** Edit Makefile and choose values for FUSE_L and FUSE_H!"; exit 1; }
 	$(AVRDUDE) -U hfuse:w:$(FUSE_H):m -U lfuse:w:$(FUSE_L):m
 
-rflash:
-	ssh $(REMOTE_HOST) "mkdir -p $(REMOTE_DIR)" || exit 1
-	rsync --rsh=ssh -r *  $(REMOTE_HOST):$(REMOTE_DIR) || exit 1
+rflash: rsync
 	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR); make clean flash" || exit 1
 	ssh $(REMOTE_HOST) "rm -rf $(REMOTE_DIR)" || exit 1
 
+rreset: rsync
+	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR); make reset" || exit 1
+	ssh $(REMOTE_HOST) "rm -rf $(REMOTE_DIR)" || exit 1
+
+rsync:
+	ssh $(REMOTE_HOST) "mkdir -p $(REMOTE_DIR)" || exit 1
+	rsync --rsh=ssh -r *  $(REMOTE_HOST):$(REMOTE_DIR) || exit 1
+
+
 # rule for uploading firmware:
 flash: firmware.hex
-	$(AVRDUDE) -U flash:w:firmware.hex:i
+	$(AVRDUDE) -U flash:w:firmware.hex:i -E noreset
+
+# reset
+reset: 
+	$(AVRDUDE) -E noreset
 
 # rule for deleting dependent files (those which can be built by Make):
 clean:
