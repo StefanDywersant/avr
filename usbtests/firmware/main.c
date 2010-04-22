@@ -1,12 +1,15 @@
+#include <stdio.h>
 #include <stdlib.h>
-#include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
+#include <avr/io.h>
 #include <util/delay.h>
 #include "owi.h"
 #include "pcf8583.h"
+#include "spi.h"
 #include "twi.h"
+#include "usart.h"
 #include "usbdrv.h"
 
 PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must match usbconfig.h */
@@ -41,7 +44,9 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
 
 static char led = 0xff;
 static pcf8583DateTimeStruct time;
-static uint8_t buf[9];
+//static uint8_t buf[9];
+
+FILE usartStdout = FDEV_SETUP_STREAM(usartPutChar, NULL, _FDEV_SETUP_WRITE);
 
 void twiPlayground() {
 /*	uint8_t request[1];
@@ -82,7 +87,7 @@ void writeMinute() {
 }
 
 void owiPlayground() {
-	uint8_t x = OwiInit();
+/*	uint8_t x = OwiInit();
 	led = x;
 
 	OwiWriteByte(0xcc);
@@ -99,10 +104,85 @@ void owiPlayground() {
 
 	OwiWriteByte(0x44);
 
-	led = buf[0];
+	led = buf[0];*/
+}
+
+void owiSearchROMs() {
+/*	uint8_t* rom = (uint8_t*)malloc(8 * sizeof(uint8_t));
+	uint8_t lastDiff = 0;
+	uint8_t lastROM[8];
+	uint8_t i;
+
+	for (i = 0; i < 8; i++)
+		lastROM[i] = 0;
+
+	led = OwiGetNextROM(lastROM, rom, &lastDiff);
+
+	led = ((uint8_t*)rom)[0];*/
+}
+
+/*
+//uint8_t spiReadWriteByte(uint8_t byte) {
+//	SPDR = byte;
+
+//	printf("SPSR: %02x\n", SPSR);
+
+	while (!(SPSR & (1 << SPIF)));
+
+	return SPDR;
+}
+
+uint8_t spiReadByte() {
+	while (!(SPSR & (1 < SPIF)));
+	return SPDR;
+}
+*/
+
+void nrf905Playground() {
+/*	printf("nRF905 playground\n");
+	DDRB = (1 << 4) | (1 << 5) | (1 << 7);
+
+	cli();
+
+	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR1) | (1 << SPR0);
+
+	PORTA = 0x00;
+
+	printf("DDRB=%02x PORTB=%02x\n", DDRB, PORTB);
+
+	printf("c0: %02x\n", spiReadWriteByte(0x10));
+
+	uint8_t i = 0;
+
+	for (i = 0; i < 10; i++)
+		printf("%d: %02x\n", i, spiReadWriteByte(0x00));
+
+	sei();
+
+	PORTA = 0x01;
+
+	SPCR = 0x0;
+
+//	printf("\n");
+
+//	PORTB &= ~(1 << 4); */
+
+	printf("SPI start\n");
+
+	spiInit();
+
+	spiReadWriteByte(0x10);
+
+	uint8_t i;
+
+	for (i = 0; i < 10; i++)
+		printf("%d: %02x\n", i, spiReadWriteByte(0x00));
+
+	spiOff();
 }
 
 void executeCommand(uchar command) {
+	printf("Executing command: 0x%02x\n", command);
 	switch (command) {
 		case 0x00:
 			twiPlayground();
@@ -116,7 +196,14 @@ void executeCommand(uchar command) {
 		case 0x03:
 			owiPlayground();
 			break;
+		case 0x04:
+			owiSearchROMs();
+			break;
+		case 0x05:
+			nrf905Playground();
+			break;
 		default:
+			usartPutByte(command);
 			led = command;
 	}
 }
@@ -144,12 +231,43 @@ uchar usbFunctionRead(uchar *data, uchar len) {
 
 	return 8;*/
 
-	uint8_t i = 0;
+//	for (i = 0; i < 2; i++)
+//		data[i] = buf[i];
 
-	for (i = 0; i < 2; i++)
-		data[i] = buf[i];
+//	return 2;
 
-	return 2;
+	uint8_t* rom = (uint8_t*)malloc(8 * sizeof(uint8_t));
+	uint8_t lastDiff = 0;
+	uint8_t lastROM[8];
+	uint8_t i;
+
+	for (i = 0; i < 8; i++)
+		lastROM[i] = 0;
+
+	printf_P("Searching for ROMs... ");
+
+	cli();
+	OwiGetNextROM(rom, rom, &lastDiff);
+
+	for (i = 0; i < 8; i++) {
+		data[i] = rom[i];
+		printf("%02x", rom[i]);
+	}
+	printf("\n");
+
+	OwiGetNextROM(rom, rom, &lastDiff);
+
+	for (i = 0; i < 8; i++) {
+		data[i] = rom[i];
+		printf("%02x", rom[i]);
+	}
+	printf("\n");
+
+	sei();
+
+	free(rom);
+
+	return 8;
 }
 
 uchar usbFunctionWrite(uchar *data, uchar len) {
@@ -162,29 +280,36 @@ uchar usbFunctionWrite(uchar *data, uchar len) {
 }
 
 int main(void) {
+	usartInit(9600);
+	stdout = &usartStdout;
+
+	printf("\n\n\nNapierdalator test board\n");
+
 	DDRB = 0xFF;
 
+	printf("Initializing TWI... ");
 	twiInit(100000);
+	printf("done\n");
 
+	printf("Initializing USB... ");
 	usbInit();
-	
 	usbDeviceDisconnect();
-	uchar i = 0;
-	while (--i) {
-//		wdt_reset();
-		_delay_ms(1);
-	}
-	
+	_delay_ms(250);
 	usbDeviceConnect();
-	sei();
+	printf("done\n");
 
-//	DBG1(0x01, 0, 0);
+	printf("Initializing interrupts... ");
+	sei();
+	printf("done\n");
+
+	printf("Entering main loop...\n\n");
+
+	DDRA |= 0xff;
+
+	PORTA = 0xff;
 
 	while (1) {
-//		wdt_reset();
 		usbPoll();
-		PORTB = led;
+//		PORTB = led;
 	}
-
-	
 }
