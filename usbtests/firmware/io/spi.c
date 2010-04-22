@@ -17,15 +17,15 @@
 
 #define SPI_MOSI_H()			{ SPI_OUTPORT(SPI_PORT) |= 0x01 << SPI_MOSI_PIN; }
 #define SPI_MOSI_L()			{ SPI_OUTPORT(SPI_PORT) &= ~(0x01 << SPI_MOSI_PIN); }
-#define SPI_SCK_H()			{ SPI_OUTPORT(SPI_PORT) |= 0x01 << SPI_SCK_PIN; }
-#define SPI_SCK_L()			{ SPI_OUTPORT(SPI_PORT) &= ~(0x01 << SPI_SCK_PIN); }
-#define SPI_CSN_H()			{ SPI_OUTPORT(SPI_PORT) |= 0x01 << SPI_CSN_PIN; }
-#define SPI_CSN_L()			{ SPI_OUTPORT(SPI_PORT) &= ~(0x01 << SPI_CSN_PIN); }
-#define SPI_MISO			(SPI_INPORT(SPI_PORT) & (0x01 << SPI_MISO_PIN))
+#define SPI_SCK_H()				{ SPI_OUTPORT(SPI_PORT) |= 0x01 << SPI_SCK_PIN; }
+#define SPI_SCK_L()				{ SPI_OUTPORT(SPI_PORT) &= ~(0x01 << SPI_SCK_PIN); }
+#define SPI_CSN_H()				{ SPI_OUTPORT(SPI_PORT) |= 0x01 << SPI_CSN_PIN; }
+#define SPI_CSN_L()				{ SPI_OUTPORT(SPI_PORT) &= ~(0x01 << SPI_CSN_PIN); }
+#define SPI_MISO				(SPI_INPORT(SPI_PORT) & (0x01 << SPI_MISO_PIN))
 #define SPI_DDR_SET()			{ \
-						SPI_DDRPORT(SPI_PORT) |= (0x01 << SPI_MOSI_PIN) | (0x01 << SPI_SCK_PIN) | (0x01 << SPI_CSN_PIN); \
-						SPI_DDRPORT(SPI_PORT) &= ~(0x01 << SPI_MISO_PIN); \
-					}
+									SPI_DDRPORT(SPI_PORT) |= (0x01 << SPI_MOSI_PIN) | (0x01 << SPI_SCK_PIN) | (0x01 << SPI_CSN_PIN); \
+									SPI_DDRPORT(SPI_PORT) &= ~(0x01 << SPI_MISO_PIN); \
+								}
 
 void spiInit() {
 	// initialize SPI bus

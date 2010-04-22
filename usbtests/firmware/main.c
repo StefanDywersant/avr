@@ -6,10 +6,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "owi.h"
-#include "pcf8583.h"
 #include "spi.h"
 #include "twi.h"
 #include "usart.h"
+#include "pcf8583.h"
 #include "usbdrv.h"
 
 PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must match usbconfig.h */
