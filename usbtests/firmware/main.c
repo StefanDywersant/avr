@@ -139,46 +139,19 @@ uint8_t spiReadByte() {
 */
 
 void nrf905Playground() {
-/*	printf("nRF905 playground\n");
-	DDRB = (1 << 4) | (1 << 5) | (1 << 7);
-
-	cli();
-
-	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR1) | (1 << SPR0);
-
-	PORTA = 0x00;
-
-	printf("DDRB=%02x PORTB=%02x\n", DDRB, PORTB);
-
-	printf("c0: %02x\n", spiReadWriteByte(0x10));
-
-	uint8_t i = 0;
-
-	for (i = 0; i < 10; i++)
-		printf("%d: %02x\n", i, spiReadWriteByte(0x00));
-
-	sei();
-
-	PORTA = 0x01;
-
-	SPCR = 0x0;
-
-//	printf("\n");
-
-//	PORTB &= ~(1 << 4); */
-
 	printf("SPI start\n");
 
-	spiInit();
-
+	spiBegin();
 	spiReadWriteByte(0x10);
 
+	uint8_t data[10];
+	spiReadData(10, data);
+
 	uint8_t i;
-
 	for (i = 0; i < 10; i++)
-		printf("%d: %02x\n", i, spiReadWriteByte(0x00));
+		printf("%d: %02x\n", i, data[i]);
 
-	spiOff();
+	spiEnd();
 }
 
 void executeCommand(uchar command) {
@@ -291,6 +264,10 @@ int main(void) {
 	twiInit(100000);
 	printf("done\n");
 
+	printf("Initializing SPI... ");
+	spiInit();
+	printf("done\n");
+
 	printf("Initializing USB... ");
 	usbInit();
 	usbDeviceDisconnect();
@@ -303,10 +280,6 @@ int main(void) {
 	printf("done\n");
 
 	printf("Entering main loop...\n\n");
-
-	DDRA |= 0xff;
-
-	PORTA = 0xff;
 
 	while (1) {
 		usbPoll();
