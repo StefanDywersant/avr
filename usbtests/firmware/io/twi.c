@@ -1,108 +1,111 @@
 #include "twi.h"
 #include <util/twi.h>
 
-// Private methods
+#define SPEED				((F_CPU / TWI_BITRATE) - 16) / 2
+#define WAIT_FOR_BUS()		{ while (!(TWCR & (1 << TWINT))); }
 
-void twiWriteStart() {
+
+static void write_start(void) {
 	TWCR = (1 << TWSTA) | (1 << TWINT) | (1 << TWEN);
 }
 
-void twiWaitForBus() {
-	while (!(TWCR & (1 << TWINT)));
-}
 
-void twiWriteStop() {
+static void write_stop(void) {
 	TWCR = (1 << TWSTO) | (1 << TWINT) | (1 << TWEN);
 }
 
-void twiWriteSlaveAddress(uint8_t address, uint8_t mode) {
+
+static void write_slave_address(uint8_t address, uint8_t mode) {
 	TWDR = (address & 0xf0) | mode;
 	TWCR = (1 << TWINT) | (1 << TWEN);
 }
 
-void twiWriteDataByte(uint8_t byte) {
+
+static void write_data_byte(uint8_t byte) {
 	TWDR = byte;
 	TWCR = (1 << TWINT) | (1 << TWEN);
 }
 
-void twiReadDataByte(uint8_t *byte, uint8_t ack) {
+
+static void read_data_byte(uint8_t *byte, uint8_t ack) {
 	if (ack)
 		TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN);
 	else
 		TWCR = (1 << TWINT) | (1 << TWEN);
 
-	twiWaitForBus();
+	WAIT_FOR_BUS();
 
 	*byte = TWDR;
 }
 
-// Public methods
 
-void twiInit(uint32_t bitrate) {
+void twi_init(void) {
 	// clear status register
 	TWSR = 0x00;
 
 	// set bitrate
-	TWBR = ((F_CPU / bitrate) - 16) / 2;
+	TWBR = SPEED;
 }
 
-uint8_t twiSyncMT(uint8_t address, uint8_t *requestData, uint8_t requestLen) {
+
+uint8_t twi_sync_mt(uint8_t address, uint8_t *req_data, uint8_t req_len) {
 	// write start condition
-	twiWriteStart();
-	twiWaitForBus();
+	write_start();
+	WAIT_FOR_BUS();
 
 	// write SLA+W
-	twiWriteSlaveAddress(address, TW_WRITE);
-	twiWaitForBus();
+	write_slave_address(address, TW_WRITE);
+	WAIT_FOR_BUS();
 
 	if (TW_STATUS != TW_MT_SLA_ACK) {
-		twiWriteStop();
+		write_stop();
 		return TWI_ERROR;
 	}
 
 	// write request data
-	while (requestLen--) {
-		twiWriteDataByte(*requestData++);
-		twiWaitForBus();
+	while (req_len--) {
+		write_data_byte(*req_data++);
+		WAIT_FOR_BUS();
 
 		if (TW_STATUS != TW_MT_DATA_ACK) {
-			twiWriteStop();
+			write_stop();
 			return TWI_ERROR;
 		}
 	}
 
 	// write stop condition
-	twiWriteStop();
+	write_stop();
 
 	while (!(TWCR & (1 << TWSTO)));
 
 	return TWI_OK;
 }
 
-uint8_t twiSyncMTMR(uint8_t address, uint8_t *requestData, uint8_t requestLen, uint8_t *responseData, uint8_t responseLen) {
+
+uint8_t twi_sync_mtmr(uint8_t address, uint8_t *req_data, uint8_t req_len, uint8_t *res_data, uint8_t res_len) {
 
 	// Master Transmitter
 
 	// write start condition
-	twiWriteStart();
-	twiWaitForBus();
+	write_start();
+	WAIT_FOR_BUS();
 
 	// write SLA+W
-	twiWriteSlaveAddress(address, TW_WRITE);
-	twiWaitForBus();
+	write_slave_address(address, TW_WRITE);
+	WAIT_FOR_BUS();
 
 	if (TW_STATUS != TW_MT_SLA_ACK) {
-		twiWriteStop();
+		write_stop();
 		return TWI_ERROR;
 	}
 
 	// write request data
-	while (requestLen--) {
-		twiWriteDataByte(*requestData++);
-		twiWaitForBus();
+	while (req_len--) {
+		write_data_byte(*req_data++);
+		WAIT_FOR_BUS();
 
 		if (TW_STATUS != TW_MT_DATA_ACK) {
-			twiWriteStop();
+			write_stop();
 			return TWI_ERROR;
 		}
 	}
@@ -110,46 +113,46 @@ uint8_t twiSyncMTMR(uint8_t address, uint8_t *requestData, uint8_t requestLen, u
 	// Master Receiver
 
 	// write repeated start
-	twiWriteStart();
-	twiWaitForBus();
+	write_start();
+	WAIT_FOR_BUS();
 
 	if (TW_STATUS != TW_REP_START) {
-		twiWriteStop();
+		write_stop();
 		return TWI_ERROR;
 	}
 
 	// write SLA+R
-	twiWriteSlaveAddress(address, TW_READ);
-	twiWaitForBus();
+	write_slave_address(address, TW_READ);
+	WAIT_FOR_BUS();
 
 	if (TW_STATUS != TW_MR_SLA_ACK) {
-		twiWriteStop();
+		write_stop();
 		return TWI_ERROR;
 	}
 
 	// read data
-	while (responseLen > 1) {
-		twiReadDataByte(responseData++, 1);
-		twiWaitForBus();
+	while (res_len > 1) {
+		read_data_byte(res_data++, 1);
+		WAIT_FOR_BUS();
 
 		if (TW_STATUS != TW_MR_DATA_ACK) {
-			twiWriteStop();
+			write_stop();
 			return TWI_ERROR;
 		}
 
-		responseLen--;
+		res_len--;
 	}
 
-	twiReadDataByte(responseData++, 0);
-	twiWaitForBus();
+	read_data_byte(res_data++, 0);
+	WAIT_FOR_BUS();
 
 	if (TW_STATUS != TW_MR_DATA_NACK) {
-		twiWriteStop();
+		write_stop();
 		return TWI_ERROR;
 	}
 
 	// write stop condition
-	twiWriteStop();
+	write_stop();
 
 	while (!(TWCR & (1 << TWSTO)));
 

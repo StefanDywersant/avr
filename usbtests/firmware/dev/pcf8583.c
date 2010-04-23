@@ -21,39 +21,39 @@ uint8_t pcf8583GetDateTime(uint8_t addr, pcf8583DateTimeStruct* time) {
 
 	// milisecond
 	type = PCF8583_ADDR_MILISECOND;
-	if (twiSyncMTMR(addr, &type, 1, &time->milisecond, 1) != TWI_OK)
+	if (twi_sync_mtmr(addr, &type, 1, &time->milisecond, 1) != TWI_OK)
 		return PCF8583_ERROR;
 	time->milisecond = (time->milisecond >> 4) * 0x0a + (time->milisecond & 0x0f);
 
 	// second
 	type = PCF8583_ADDR_SECOND;
-	if (twiSyncMTMR(addr, &type, 1, &time->second, 1) != TWI_OK)
+	if (twi_sync_mtmr(addr, &type, 1, &time->second, 1) != TWI_OK)
 		return PCF8583_ERROR;
 	time->second = (time->second >> 4) * 0x0a + (time->second & 0x0f);
 
 	// minute
 	type = PCF8583_ADDR_MINUTE;
-	if (twiSyncMTMR(addr, &type, 1, &time->minute, 1) != TWI_OK)
+	if (twi_sync_mtmr(addr, &type, 1, &time->minute, 1) != TWI_OK)
 		return PCF8583_ERROR;
 	time->minute = (time->minute >> 4) * 0x0a + (time->minute & 0x0f);
 
 	// hour
 	type = PCF8583_ADDR_HOUR;
-	if (twiSyncMTMR(addr, &type, 1, &time->hour, 1) != TWI_OK)
+	if (twi_sync_mtmr(addr, &type, 1, &time->hour, 1) != TWI_OK)
 		return PCF8583_ERROR;
 	time->hour = (time->hour >> 4) * 0x0a + (time->hour & 0x0f);
 
 	// year/date
 	type = PCF8583_ADDR_YEAR_DATE;
 	uint8_t buf;
-	if (twiSyncMTMR(addr, &type, 1, &buf, 1) != TWI_OK)
+	if (twi_sync_mtmr(addr, &type, 1, &buf, 1) != TWI_OK)
 		return PCF8583_ERROR;
 	time->year = buf >> 6; // 0 - 3
 	time->date = ((buf & 0x30) >> 4) * 0x0a + (buf & 0x0f); // 0 - 31
 
 	// weekday/month
 	type = PCF8583_ADDR_WEEKDAY_MONTH;
-	if (twiSyncMTMR(addr, &type, 1, &buf, 1) != TWI_OK)
+	if (twi_sync_mtmr(addr, &type, 1, &buf, 1) != TWI_OK)
 		return PCF8583_ERROR;
 	time->weekday = buf >> 5; // 0 - 6
 	time->month = ((buf & 0x10) >> 4) * 0x0a + (buf & 0x0f); // 1 - 12
@@ -72,7 +72,7 @@ uint8_t pcf8583SetDateTime(uint8_t addr, pcf8583DateTimeStruct* time) {
 	request[5] = (time->year << 6) | ((time->date / 0xa) << 4) | (time->date - (time->date / 0xa) * 0xa);
 	request[6] = (time->weekday << 5) | ((time->month / 0xa) << 4) | (time->month - (time->month / 0xa) * 0xa);
 
-	if (twiSyncMT(addr, request, 7) != TWI_OK)
+	if (twi_sync_mt(addr, request, 7) != TWI_OK)
 		return PCF8583_ERROR;
 
 	return PCF8583_OK;

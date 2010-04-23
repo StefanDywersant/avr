@@ -10,81 +10,88 @@
 #include <util/delay.h>
 #include "spi.h"
 
-#define SPI_CONCAT(a, b)		a ## b
-#define SPI_OUTPORT(name)		SPI_CONCAT(PORT, name)
-#define SPI_DDRPORT(name)		SPI_CONCAT(DDR, name)
-#define SPI_INPORT(name)		SPI_CONCAT(PIN, name)
+#define CONCAT(a, b)		a ## b
+#define OUTPORT(name)		CONCAT(PORT, name)
+#define DDRPORT(name)		CONCAT(DDR, name)
+#define INPORT(name)		CONCAT(PIN, name)
 
-#define SPI_MOSI_H()			{ SPI_OUTPORT(SPI_PORT) |= 0x01 << SPI_MOSI_PIN; }
-#define SPI_MOSI_L()			{ SPI_OUTPORT(SPI_PORT) &= ~(0x01 << SPI_MOSI_PIN); }
-#define SPI_SCK_H()				{ SPI_OUTPORT(SPI_PORT) |= 0x01 << SPI_SCK_PIN; }
-#define SPI_SCK_L()				{ SPI_OUTPORT(SPI_PORT) &= ~(0x01 << SPI_SCK_PIN); }
-#define SPI_CSN_H()				{ SPI_OUTPORT(SPI_PORT) |= 0x01 << SPI_CSN_PIN; }
-#define SPI_CSN_L()				{ SPI_OUTPORT(SPI_PORT) &= ~(0x01 << SPI_CSN_PIN); }
-#define SPI_MISO				(SPI_INPORT(SPI_PORT) & (0x01 << SPI_MISO_PIN))
-#define SPI_DDR_SET()			{ \
-									SPI_DDRPORT(SPI_PORT) |= (0x01 << SPI_MOSI_PIN) | (0x01 << SPI_SCK_PIN) | (0x01 << SPI_CSN_PIN); \
-									SPI_DDRPORT(SPI_PORT) &= ~(0x01 << SPI_MISO_PIN); \
+#define MOSI_H()			{ OUTPORT(SPI_PORT) |= 0x01 << SPI_MOSI_PIN; }
+#define MOSI_L()			{ OUTPORT(SPI_PORT) &= ~(0x01 << SPI_MOSI_PIN); }
+#define SCK_H()				{ OUTPORT(SPI_PORT) |= 0x01 << SPI_SCK_PIN; }
+#define SCK_L()				{ OUTPORT(SPI_PORT) &= ~(0x01 << SPI_SCK_PIN); }
+#define CSN_H()				{ OUTPORT(SPI_PORT) |= 0x01 << SPI_CSN_PIN; }
+#define CSN_L()				{ OUTPORT(SPI_PORT) &= ~(0x01 << SPI_CSN_PIN); }
+#define MISO				(INPORT(SPI_PORT) & (0x01 << SPI_MISO_PIN))
+#define DDR_SETUP()			{ \
+									DDRPORT(SPI_PORT) |= (0x01 << SPI_MOSI_PIN) | (0x01 << SPI_SCK_PIN) | (0x01 << SPI_CSN_PIN); \
+									DDRPORT(SPI_PORT) &= ~(0x01 << SPI_MISO_PIN); \
 								}
 
-void spiInit() {
+#define WAIT()				{ _delay_us(SPI_FREQ / 1000); }
+
+
+void spi_init() {
 	// initialize SPI bus
-	SPI_DDR_SET();
+	DDR_SETUP();
 
 	// set CSN high
-	SPI_CSN_H();
+	CSN_H();
 }
 
-void spiBegin() {
+
+void spi_begin() {
 	// disable interrupts
 	cli();
 
 	// activate peripherial
-	SPI_CSN_L();
+	CSN_L();
 }
 
-void spiEnd() {
+
+void spi_end() {
 	// deactivate peripherial
-	SPI_CSN_H();
+	CSN_H();
 
 	// enable interrupts
 	sei();
 }
 
-uint8_t spiReadWriteByte(uint8_t wr) {
+
+uint8_t spi_read_write_byte(uint8_t wr) {
 	uint8_t i;
 	uint8_t re = 0x00;
 
 	for (i = 0; i < 8; i++) {
 		if ((wr << i) & 0x80) {
-			SPI_MOSI_H();
+			MOSI_H();
 		} else {
-			SPI_MOSI_L();
+			MOSI_L();
 		}
 
-		SPI_SCK_H();
-		_delay_us(10);
+		SCK_H();
+		WAIT();
 
-		re |= SPI_MISO << (7 - i);
+		re |= MISO << (7 - i);
 
-		SPI_SCK_L();
-		_delay_us(10);
+		SCK_L();
+		WAIT();
 	}
 
 	return re;
 }
 
-void spiReadData(uint8_t len, uint8_t* data) {
+
+void spi_read_data(uint8_t len, uint8_t* data) {
 	uint8_t i;
 
 	for (i = 0; i < len; i++)
-		data[i] = spiReadWriteByte(0x00);
+		data[i] = spi_read_write_byte(0x00);
 }
 
-void spiWriteData(uint8_t len, uint8_t* data) {
+
+void spi_write_data(uint8_t len, uint8_t* data) {
 	uint8_t i;
 
 	for (i = 0; i < len; i++)
-		spiReadWriteByte(data[i]);
+		spi_read_write_byte(data[i]);
 }
-
