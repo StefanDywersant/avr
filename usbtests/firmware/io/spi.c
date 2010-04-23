@@ -82,16 +82,12 @@ uint8_t spi_read_write_byte(uint8_t wr) {
 
 
 void spi_read_data(uint8_t len, uint8_t* data) {
-	uint8_t i;
-
-	for (i = 0; i < len; i++)
-		data[i] = spi_read_write_byte(0x00);
+	while (len--)
+		*data++ = spi_read_write_byte(0x00);
 }
 
 
 void spi_write_data(uint8_t len, uint8_t* data) {
-	uint8_t i;
-
-	for (i = 0; i < len; i++)
-		spi_read_write_byte(data[i]);
+	while (len--)
+		spi_read_write_byte(*data++);
 }

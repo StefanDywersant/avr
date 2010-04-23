@@ -25,9 +25,9 @@ typedef struct {
 	uint8_t month;
 	uint8_t year;
 	uint8_t weekday;
-} pcf8583DateTimeStruct;
+} pcf8583_datetime_t;
 
-uint8_t pcf8583GetDateTime(uint8_t addr, pcf8583DateTimeStruct* time);
+uint8_t pcf8583_get_datetime(uint8_t addr, pcf8583_datetime_t* dt);
 
 
 /**
@@ -38,15 +38,14 @@ uint8_t pcf8583GetDateTime(uint8_t addr, pcf8583DateTimeStruct* time);
  * @param time Pointer to DateTime struct
  * @return PCF8583_OK on success, PCF8583_ERROR otherwise
  */
-uint8_t pcf8583SetDateTime(uint8_t addr, pcf8583DateTimeStruct* time);
-
+uint8_t pcf8583_set_datetime(uint8_t addr, pcf8583_datetime_t* dt);
 
 /**
- * Allocates memory for new pcf8583DateTimeStruct.
+ * Allocates memory for new pcf8583_datetime_t.
  *
  * @author Karol Maciaszek
  * @return Pointer to allocated memory
  */
-pcf8583DateTimeStruct* pcf8583NewDateTimeStruct();
+pcf8583_datetime_t* pcf8583_new_datetime(void);
 
 #endif /* PCF8583_H_ */
