@@ -41,7 +41,7 @@ uint32_t nrf905_get_address() {
 
 	spiEnd();
 
-	return (buf[1] < 8) | buf[0];
+	return ((uint32_t)buf[3] << 24) | ((uint32_t)buf[2] << 16) | ((uint32_t)buf[1] << 8) | (uint32_t)buf[0];
 }
 
 static void nrf905_read_control_register() {
