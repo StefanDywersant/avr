@@ -150,9 +150,9 @@ void nrf905Playground() {
 
 //	nrf905_read_control_register();
 
-	printf("CH_NO=%d\n", nrf905_get_channel_no());
+	printf("CH_NO=0x%03x\n", nrf905_get_channel_no());
 
-	printf("ADDR=%04x\n", nrf905_get_address());
+	printf("ADDR=0x%04lx\n", nrf905_get_address());
 
 //	uint8_t i;
 //	for (i = 0; i < 10; i++)
