@@ -9,6 +9,7 @@
 #include "spi.h"
 #include "twi.h"
 #include "usart.h"
+#include "nrf905.h"
 #include "pcf8583.h"
 #include "usbdrv.h"
 
@@ -141,17 +142,23 @@ uint8_t spiReadByte() {
 void nrf905Playground() {
 	printf("SPI start\n");
 
-	spiBegin();
+/*	spiBegin();
 	spiReadWriteByte(0x10);
 
 	uint8_t data[10];
-	spiReadData(10, data);
+	spiReadData(10, data);*/
 
-	uint8_t i;
-	for (i = 0; i < 10; i++)
-		printf("%d: %02x\n", i, data[i]);
+//	nrf905_read_control_register();
 
-	spiEnd();
+	printf("CH_NO=%d\n", nrf905_get_channel_no());
+
+	printf("ADDR=%04x\n", nrf905_get_address());
+
+//	uint8_t i;
+//	for (i = 0; i < 10; i++)
+//		printf("%d: %02x\n", i, cr[i]);
+
+//	spiEnd();
 }
 
 void executeCommand(uchar command) {
