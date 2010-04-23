@@ -8,15 +8,14 @@
 #ifndef OWI_H_
 #define OWI_H_
 
-#define OWI_PORT	D
-#define OWI_PIN		3
+#include "owiconfig.h"
 
-uint8_t OwiInit();
+uint8_t owi_init(void);
 
-void OwiWriteByte(uint8_t byte);
+void owi_write_byte(uint8_t byte);
 
-uint8_t OwiReadByte();
+uint8_t owi_read_byte(void);
 
-uint8_t OwiGetNextROM(uint8_t* prevROM, uint8_t* nextROM, uint8_t *lastDiff);
+uint8_t owi_get_next_rom(uint8_t* rom, uint8_t *last_diff);
 
 #endif /* OWI_H_ */

@@ -5,27 +5,22 @@
  *      Author: kharg
  */
 
-#include <avr/io.h>
-
 #ifndef SPI_H_
 #define SPI_H_
 
-#define SPI_PORT	A
-#define SPI_MISO_PIN	0
-#define SPI_SCK_PIN	1
-#define SPI_MOSI_PIN	2
-#define SPI_CSN_PIN	3
+#include <avr/io.h>
+#include "spiconfig.h"
 
-void spiInit();
+void spi_init();
 
-void spiBegin();
+void spi_begin();
 
-void spiEnd();
+void spi_end();
 
-uint8_t spiReadWriteByte(uint8_t byte);
+uint8_t spi_read_write_byte(uint8_t byte);
 
-void spiReadData(uint8_t len, uint8_t* data);
+void spi_read_data(uint8_t len, uint8_t* data);
 
-void spiWriteData(uint8_t len, uint8_t* data);
+void spi_write_data(uint8_t len, uint8_t* data);
 
 #endif /* SPI_H_ */

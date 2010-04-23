@@ -47,7 +47,7 @@ static char led = 0xff;
 static pcf8583DateTimeStruct time;
 //static uint8_t buf[9];
 
-FILE usartStdout = FDEV_SETUP_STREAM(usartPutChar, NULL, _FDEV_SETUP_WRITE);
+FILE usart_stdout = FDEV_SETUP_STREAM(usart_put_char, NULL, _FDEV_SETUP_WRITE);
 
 void twiPlayground() {
 /*	uint8_t request[1];
@@ -66,6 +66,8 @@ void readSecond() {
 		led = 0xaa;
 		return;
 	}
+
+	printf("Second: 0x%02x\n", time.second);
 }
 
 void writeMinute() {
@@ -183,7 +185,6 @@ void executeCommand(uchar command) {
 			nrf905Playground();
 			break;
 		default:
-			usartPutByte(command);
 			led = command;
 	}
 }
@@ -217,17 +218,13 @@ uchar usbFunctionRead(uchar *data, uchar len) {
 //	return 2;
 
 	uint8_t* rom = (uint8_t*)malloc(8 * sizeof(uint8_t));
-	uint8_t lastDiff = 0;
-	uint8_t lastROM[8];
+	uint8_t last_diff = 0;
 	uint8_t i;
-
-	for (i = 0; i < 8; i++)
-		lastROM[i] = 0;
 
 	printf_P("Searching for ROMs... ");
 
 	cli();
-	OwiGetNextROM(rom, rom, &lastDiff);
+	owi_get_next_rom(rom, &last_diff);
 
 	for (i = 0; i < 8; i++) {
 		data[i] = rom[i];
@@ -235,7 +232,7 @@ uchar usbFunctionRead(uchar *data, uchar len) {
 	}
 	printf("\n");
 
-	OwiGetNextROM(rom, rom, &lastDiff);
+	owi_get_next_rom(rom, &last_diff);
 
 	for (i = 0; i < 8; i++) {
 		data[i] = rom[i];
@@ -260,19 +257,19 @@ uchar usbFunctionWrite(uchar *data, uchar len) {
 }
 
 int main(void) {
-	usartInit(9600);
-	stdout = &usartStdout;
+	usart_init();
+	stdout = &usart_stdout;
 
 	printf("\n\n\nNapierdalator test board\n");
 
 	DDRB = 0xFF;
 
 	printf("Initializing TWI... ");
-	twiInit(100000);
+	twi_init();
 	printf("done\n");
 
 	printf("Initializing SPI... ");
-	spiInit();
+	spi_init();
 	printf("done\n");
 
 	printf("Initializing USB... ");
