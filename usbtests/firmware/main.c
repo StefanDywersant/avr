@@ -44,7 +44,7 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
 };
 
 static char led = 0xff;
-static pcf8583DateTimeStruct time;
+static pcf8583_datetime_t time;
 //static uint8_t buf[9];
 
 FILE usart_stdout = FDEV_SETUP_STREAM(usart_put_char, NULL, _FDEV_SETUP_WRITE);
@@ -62,7 +62,7 @@ void twiPlayground() {
 }
 
 void readSecond() {
-	if (pcf8583GetDateTime(0xa0, &time) != PCF8583_OK) {
+	if (pcf8583_get_datetime(0xa0, &time) != PCF8583_OK) {
 		led = 0xaa;
 		return;
 	}
@@ -71,7 +71,7 @@ void readSecond() {
 }
 
 void writeMinute() {
-	pcf8583DateTimeStruct* _time = pcf8583NewDateTimeStruct();
+	pcf8583_datetime_t* _time = pcf8583_new_datetime();
 	_time->milisecond = 0x00;
 	_time->second = 0x00;
 	_time->minute = 0x00;
@@ -81,7 +81,7 @@ void writeMinute() {
 	_time->year = 0x02;
 	_time->weekday = 0x01;
 
-	if (pcf8583SetDateTime(0xa0, _time) != PCF8583_OK) {
+	if (pcf8583_set_datetime(0xa0, _time) != PCF8583_OK) {
 		led = 0x55;
 		return;
 	}
@@ -142,7 +142,7 @@ uint8_t spiReadByte() {
 */
 
 void nrf905Playground() {
-	printf("SPI start\n");
+	printf("NRF905 Playground\n");
 
 /*	spiBegin();
 	spiReadWriteByte(0x10);
@@ -152,15 +152,34 @@ void nrf905Playground() {
 
 //	nrf905_read_control_register();
 
-	printf("CH_NO=0x%03x\n", nrf905_get_channel_no());
+	printf(" CH_NO=0x%03x\n", nrf905_get_channel_no());
 
-	printf("ADDR=0x%04lx\n", nrf905_get_address());
+	printf(" ADDR=0x%04lx\n", nrf905_get_address());
+
+	nrf905_set_channel_no(0x101);
+
+	printf("\n");
 
 //	uint8_t i;
 //	for (i = 0; i < 10; i++)
 //		printf("%d: %02x\n", i, cr[i]);
 
 //	spiEnd();
+}
+
+void nrf905ReadControlRegister() {
+	uint8_t i;
+	uint8_t buf[10];
+
+	printf("NRF905 Control Register:\n");
+
+	nrf905_read_control_register(buf);
+
+	for (i = 0; i < 10; i++)
+		printf("cr[0x%02x]=0x%02x\n", i, buf[i]);
+
+	printf("\n");
+
 }
 
 void executeCommand(uchar command) {
@@ -183,6 +202,9 @@ void executeCommand(uchar command) {
 			break;
 		case 0x05:
 			nrf905Playground();
+			break;
+		case 0x06:
+			nrf905ReadControlRegister();
 			break;
 		default:
 			led = command;
