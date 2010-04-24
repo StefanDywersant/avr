@@ -305,6 +305,10 @@ int main(void) {
 	sei();
 	printf("done\n");
 
+	printf("Initializing nrf905... ");
+	nrf905_init();
+	printf("done\n");
+
 	printf("Entering main loop...\n\n");
 
 	while (1) {
