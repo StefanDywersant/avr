@@ -142,29 +142,31 @@ uint8_t spiReadByte() {
 */
 
 void nrf905Playground() {
+	uint8_t buf[32];
+	uint8_t i;
+
+
 	printf("NRF905 Playground\n");
-
-/*	spiBegin();
-	spiReadWriteByte(0x10);
-
-	uint8_t data[10];
-	spiReadData(10, data);*/
-
-//	nrf905_read_control_register();
 
 	printf(" CH_NO=0x%03x\n", nrf905_get_channel_no());
 
-	printf(" ADDR=0x%04lx\n", nrf905_get_address());
+	printf(" RXADDR=0x%04lx\n", nrf905_get_rx_address());
 
-	nrf905_set_channel_no(0x101);
+	printf(" TXADDR=0x%04lx\n", nrf905_get_tx_address());
 
+	nrf905_get_tx_payload(buf);
+	printf(" TXPAYLOAD=0x");
+	for (i = 0; i < 32; i++)
+		printf("%02x", buf[i]);
 	printf("\n");
 
-//	uint8_t i;
-//	for (i = 0; i < 10; i++)
-//		printf("%d: %02x\n", i, cr[i]);
+	nrf905_get_rx_payload(buf);
+	printf(" RXPAYLOAD=0x");
+	for (i = 0; i < 32; i++)
+		printf("%02x", buf[i]);
+	printf("\n");
 
-//	spiEnd();
+	printf("\n");
 }
 
 void nrf905ReadControlRegister() {
@@ -180,6 +182,16 @@ void nrf905ReadControlRegister() {
 
 	printf("\n");
 
+}
+
+void nrf905TxPacket() {
+	uint8_t payload[32];
+
+	uint8_t i;
+	for (i = 0; i < 32; i++)
+		payload[i] = i;
+
+	nrf905_tx_packet(0x11223344, 32, payload);
 }
 
 void executeCommand(uchar command) {
@@ -205,6 +217,9 @@ void executeCommand(uchar command) {
 			break;
 		case 0x06:
 			nrf905ReadControlRegister();
+			break;
+		case 0x07:
+			nrf905TxPacket();
 			break;
 		default:
 			led = command;
