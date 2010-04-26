@@ -112,7 +112,7 @@ extern void odDebug(uchar prefix, uchar *data, uchar len);
 static inline void  odDebugInit(void)
 {
     ODDBG_UCR |= (1<<ODDBG_TXEN);
-    ODDBG_UBRR = F_CPU / (19200 * 16L) - 1;
+    ODDBG_UBRR = F_CPU / (9600 * 16L) - 1;
 }
 #else
 #   define odDebugInit()

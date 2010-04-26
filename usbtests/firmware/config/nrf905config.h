@@ -7,11 +7,11 @@
 #ifndef NRF905CONFIG_H_
 #define NRF905CONFIG_H_
 
-#define PORT				A
-#define TX_EN_PIN			4
-#define TRX_CE_PIN			5
-#define PWR_UP_PIN			6
-#define DR_PIN				7
+#define PORT				B
+#define TX_EN_PIN			0
+#define TRX_CE_PIN			3
+#define PWR_UP_PIN			1
+#define DR_PIN				2
 
 // Sets center frequency
 #define CH_NO				0x01fe
