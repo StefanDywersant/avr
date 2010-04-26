@@ -288,11 +288,8 @@ uchar usbFunctionRead(uchar *data, uchar len) {
 	return 8;
 }
 
-SIGNAL(SIG_INTERRUPT2) {
-	uint8_t i;
-
-	for (i = 0; i < 255; i++)
-		PRINTF("INT2!\n");
+ISR(INT2_vect) {
+	PRINTF("INT2!\n");
 }
 
 uchar usbFunctionWrite(uchar *data, uchar len) {
@@ -328,8 +325,8 @@ int main(void) {
 	PRINTF("done\n");
 
 	PRINTF("Initializing interrupts... ");
-	GIFR |= 0x01 << INTF2;
-	MCUCR |= 0x01 << ISC2;
+	GICR |= 0x01 << INT2;
+	MCUCSR |= 0x01 << ISC2;
 	SREG |= 0x01 << SREG_I;
 	sei();
 	PRINTF("done\n");
