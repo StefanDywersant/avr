@@ -7,7 +7,7 @@ AVRDUDE = avrdude -c $(PROG_ID) -p $(DEVICE) # edit this line for your programme
 REMOTE_HOST = twarzromana.czystybeton.pl
 REMOTE_DIR = __avr
 
-CFLAGS  = -I. -Iconfig -Idev -Iio -Iio/usbdrv -DDEBUG_LEVEL=0
+CFLAGS  = -I. -Iconfig -Idev -Iio -Iio/usbdrv -DDEBUG_LEVEL=0 -DDEBUG=1
 OBJECTS = main.o dev/nrf905.o dev/pcf8583.o io/owi.o io/spi.o io/twi.o io/usart.o io/usbdrv/oddebug.o io/usbdrv/usbdrv.o io/usbdrv/usbdrvasm.o
 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)

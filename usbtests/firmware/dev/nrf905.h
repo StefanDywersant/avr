@@ -22,9 +22,11 @@ void nrf905_set_channel_no(uint16_t no);
 
 void nrf905_tx_packet(uint32_t addr, uint8_t len, uint8_t* payload);
 
+void nrf905_rx_packet(uint8_t len, uint8_t* payload);
+
 void nrf905_get_tx_payload(uint8_t* payload);
 
-void nrf905_get_rx_payload(uint8_t* payload);
+uint8_t nrf905_get_status_register(void);
 
 void nrf905_read_control_register(uint8_t* buf);
 

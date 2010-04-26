@@ -36,26 +36,33 @@
 										OUTPORT(PORT) |= (0x01 << PWR_UP_PIN); \
 										OUTPORT(PORT) &= ~(0x01 << TX_EN_PIN); \
 									}
-#define TX_PACKET()					{ \
+#define TX_PACKET()					{ OUTPORT(PORT) |= (0x01 << PWR_UP_PIN) | (0x01 << TRX_CE_PIN) | (0x01 << TX_EN_PIN); }
+#define RX_PACKET()					{ \
 										OUTPORT(PORT) |= (0x01 << PWR_UP_PIN) | (0x01 << TRX_CE_PIN); \
 										OUTPORT(PORT) &= ~(0x01 << TX_EN_PIN); \
 									}
-#define RX_PACKET()					{ OUTPORT(PORT) |= (0x01 << PWR_UP_PIN) | (0x01 << TRX_CE_PIN) | (0x01 << TX_EN_PIN); }
 
+static uint8_t command_read(uint8_t cmd, uint8_t len, uint8_t* buf) {
+	uint8_t sr;
 
-static void command_read(uint8_t cmd, uint8_t len, uint8_t* buf) {
 	spi_begin();
-	spi_read_write_byte(cmd);
+	sr = spi_read_write_byte(cmd);
 	spi_read_data(len, buf);
 	spi_end();
+
+	return sr;
 }
 
 
-static void command_write(uint8_t cmd, uint8_t len, uint8_t* buf) {
+static uint8_t command_write(uint8_t cmd, uint8_t len, uint8_t* buf) {
+	uint8_t sr;
+
 	spi_begin();
-	spi_read_write_byte(cmd);
+	sr = spi_read_write_byte(cmd);
 	spi_write_data(len, buf);
 	spi_end();
+
+	return sr;
 }
 
 
@@ -129,6 +136,7 @@ void nrf905_tx_packet(uint32_t addr, uint8_t len, uint8_t* payload) {
 	STANDBY();
 	command_write(WRITE_TX_ADDRESS, 4, (uint8_t*)&addr);
 	command_write(WRITE_TX_PAYLOAD, len, payload);
+	TX_PACKET();
 }
 
 
@@ -148,7 +156,12 @@ void nrf905_get_tx_payload(uint8_t* payload) {
 }
 
 
-void nrf905_get_rx_payload(uint8_t* payload) {
+void nrf905_rx_packet(uint8_t len, uint8_t* payload) {
 	READ_RX();
-	command_read(READ_RX_PAYLOAD, 32, payload);
+	command_read(READ_RX_PAYLOAD, len, payload);
+}
+
+uint8_t nrf905_get_status_register(void) {
+	STANDBY();
+	return command_read(READ_CONFIG, 0, NULL);
 }

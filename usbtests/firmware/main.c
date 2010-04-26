@@ -5,10 +5,12 @@
 #include <avr/wdt.h>
 #include <avr/io.h>
 #include <util/delay.h>
+#include "debug.h"
 #include "owi.h"
 #include "spi.h"
 #include "twi.h"
 #include "usart.h"
+#include "oddebug.h"
 #include "nrf905.h"
 #include "pcf8583.h"
 #include "usbdrv.h"
@@ -67,7 +69,7 @@ void readSecond() {
 		return;
 	}
 
-	printf("Second: 0x%02x\n", time.second);
+	PRINTF("Second: 0x%02x\n", time.second);
 }
 
 void writeMinute() {
@@ -128,7 +130,7 @@ void owiSearchROMs() {
 //uint8_t spiReadWriteByte(uint8_t byte) {
 //	SPDR = byte;
 
-//	printf("SPSR: %02x\n", SPSR);
+//	PRINTF("SPSR: %02x\n", SPSR);
 
 	while (!(SPSR & (1 << SPIF)));
 
@@ -146,41 +148,43 @@ void nrf905Playground() {
 	uint8_t i;
 
 
-	printf("NRF905 Playground\n");
+	PRINTF("NRF905 Playground\n");
 
-	printf(" CH_NO=0x%03x\n", nrf905_get_channel_no());
+	PRINTF(" SR=%02x\n", nrf905_get_status_register());
 
-	printf(" RXADDR=0x%04lx\n", nrf905_get_rx_address());
+	PRINTF(" CH_NO=0x%03x\n", nrf905_get_channel_no());
 
-	printf(" TXADDR=0x%04lx\n", nrf905_get_tx_address());
+	PRINTF(" RXADDR=0x%04lx\n", nrf905_get_rx_address());
+
+	PRINTF(" TXADDR=0x%04lx\n", nrf905_get_tx_address());
 
 	nrf905_get_tx_payload(buf);
-	printf(" TXPAYLOAD=0x");
+	PRINTF(" TXPAYLOAD=0x");
 	for (i = 0; i < 32; i++)
-		printf("%02x", buf[i]);
-	printf("\n");
+		PRINTF("%02x", buf[i]);
+	PRINTF("\n");
 
-	nrf905_get_rx_payload(buf);
-	printf(" RXPAYLOAD=0x");
+	nrf905_rx_packet(32, buf);
+	PRINTF(" RXPAYLOAD=0x");
 	for (i = 0; i < 32; i++)
-		printf("%02x", buf[i]);
-	printf("\n");
+		PRINTF("%02x", buf[i]);
+	PRINTF("\n");
 
-	printf("\n");
+	PRINTF("\n");
 }
 
 void nrf905ReadControlRegister() {
 	uint8_t i;
 	uint8_t buf[10];
 
-	printf("NRF905 Control Register:\n");
+	PRINTF("NRF905 Control Register:\n");
 
 	nrf905_read_control_register(buf);
 
 	for (i = 0; i < 10; i++)
-		printf("cr[0x%02x]=0x%02x\n", i, buf[i]);
+		PRINTF("cr[0x%02x]=0x%02x\n", i, buf[i]);
 
-	printf("\n");
+	PRINTF("\n");
 
 }
 
@@ -195,7 +199,7 @@ void nrf905TxPacket() {
 }
 
 void executeCommand(uchar command) {
-	printf("Executing command: 0x%02x\n", command);
+	PRINTF("Executing command: 0x%02x\n", command);
 	switch (command) {
 		case 0x00:
 			twiPlayground();
@@ -258,30 +262,37 @@ uchar usbFunctionRead(uchar *data, uchar len) {
 	uint8_t last_diff = 0;
 	uint8_t i;
 
-	printf_P("Searching for ROMs... ");
+	PRINTF("Searching for ROMs... ");
 
 	cli();
 	owi_get_next_rom(rom, &last_diff);
 
 	for (i = 0; i < 8; i++) {
 		data[i] = rom[i];
-		printf("%02x", rom[i]);
+		PRINTF("%02x", rom[i]);
 	}
-	printf("\n");
+	PRINTF("\n");
 
 	owi_get_next_rom(rom, &last_diff);
 
 	for (i = 0; i < 8; i++) {
 		data[i] = rom[i];
-		printf("%02x", rom[i]);
+		PRINTF("%02x", rom[i]);
 	}
-	printf("\n");
+	PRINTF("\n");
 
 	sei();
 
 	free(rom);
 
 	return 8;
+}
+
+SIGNAL(SIG_INTERRUPT2) {
+	uint8_t i;
+
+	for (i = 0; i < 255; i++)
+		PRINTF("INT2!\n");
 }
 
 uchar usbFunctionWrite(uchar *data, uchar len) {
@@ -297,34 +308,39 @@ int main(void) {
 	usart_init();
 	stdout = &usart_stdout;
 
-	printf("\n\n\nNapierdalator test board\n");
+	PRINTF("\n\n\nNapierdalator test board\n");
 
 	DDRB = 0xFF;
 
-	printf("Initializing TWI... ");
+	PRINTF("Initializing TWI... ");
 	twi_init();
-	printf("done\n");
+	PRINTF("done\n");
 
-	printf("Initializing SPI... ");
+	PRINTF("Initializing SPI... ");
 	spi_init();
-	printf("done\n");
+	PRINTF("done\n");
 
-	printf("Initializing USB... ");
+	PRINTF("Initializing USB... ");
 	usbInit();
 	usbDeviceDisconnect();
 	_delay_ms(250);
 	usbDeviceConnect();
-	printf("done\n");
+	PRINTF("done\n");
 
-	printf("Initializing interrupts... ");
+	PRINTF("Initializing interrupts... ");
+	GIFR |= 0x01 << INTF2;
+	MCUCR |= 0x01 << ISC2;
+	SREG |= 0x01 << SREG_I;
 	sei();
-	printf("done\n");
+	PRINTF("done\n");
 
-	printf("Initializing nrf905... ");
+	PRINTF("Initializing nrf905... ");
 	nrf905_init();
-	printf("done\n");
+	PRINTF("done\n");
 
-	printf("Entering main loop...\n\n");
+	odDebugInit();
+
+	PRINTF("Entering main loop...\n\n");
 
 	while (1) {
 		usbPoll();
