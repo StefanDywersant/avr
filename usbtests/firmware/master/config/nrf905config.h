@@ -7,11 +7,20 @@
 #ifndef NRF905CONFIG_H_
 #define NRF905CONFIG_H_
 
+// PIN configuration
 #define PORT				B
 #define TX_EN_PIN			0
 #define TRX_CE_PIN			3
 #define PWR_UP_PIN			1
 #define DR_PIN				2
+
+// Data Ready Interrupt configuration
+#define DR_SETUP()			{ \
+								GICR |= 0x01 << INT2; \
+								MCUCSR |= 0x01 << ISC2; \
+								SREG |= 0x01 << SREG_I; \
+							}
+#define DR_INT_VECT			INT2_vect
 
 // Sets center frequency
 #define CH_NO				0x01fe

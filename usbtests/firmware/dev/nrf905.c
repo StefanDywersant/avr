@@ -42,6 +42,11 @@
 										OUTPORT(PORT) &= ~(0x01 << TX_EN_PIN); \
 									}
 
+// get TX_EN state
+#define GET_TX_EN					(OUTPORT(PORT) & (0x01 << TX_EN_PIN)) >> TX_EN_PIN
+
+static void (*receive_packet_callback)(void) = NULL;
+
 static uint8_t command_read(uint8_t cmd, uint8_t len, uint8_t* buf) {
 	uint8_t sr;
 
@@ -69,7 +74,6 @@ static uint8_t command_write(uint8_t cmd, uint8_t len, uint8_t* buf) {
 void nrf905_init(void) {
 	// setting up port
 	DDRPORT(PORT) |= (0x01 << TX_EN_PIN) | (0x01 << TRX_CE_PIN) | (0x01 << PWR_UP_PIN);
-	DDRPORT(PORT) &= ~(0x01 << DR_PIN);
 
 	// setting chip mode to standby
 	STANDBY();
@@ -91,6 +95,9 @@ void nrf905_init(void) {
 
 	// write config register
 	command_write(WRITE_CONFIG | 0x00, 10, buf);
+
+	// setup data ready interrupt
+	DR_SETUP();
 
 	free(buf);
 }
@@ -161,7 +168,25 @@ void nrf905_rx_packet(uint8_t len, uint8_t* payload) {
 	command_read(READ_RX_PAYLOAD, len, payload);
 }
 
+
 uint8_t nrf905_get_status_register(void) {
 	STANDBY();
 	return command_read(READ_CONFIG, 0, NULL);
 }
+
+void nrf905_set_receive_packet_callback(void (*receive_packet_callback)(void) func) {
+	receive_packet_callback =
+}
+
+ISR(DR_INT_VECT) {
+	if (GET_TX_EN) {
+		// transmit complete
+		RX_PACKET();
+	} else {
+		// receive complete
+		receive_packet_callback();
+
+		RX_PACKET();
+	}
+}
+

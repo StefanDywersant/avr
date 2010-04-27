@@ -12,18 +12,18 @@
 #define SPI_FREQ		1000
 
 // SPI port
-#define SPI_PORT		A
+#define SPI_PORT		B
 
 // MISO pin (Master Input Slave Output)
-#define SPI_MISO_PIN	0
+#define SPI_MISO_PIN	4
 
 // MOSI pin (Master Output Slave Input)
-#define SPI_MOSI_PIN	2
+#define SPI_MOSI_PIN	5
 
 // SCK pin (Clock)
-#define SPI_SCK_PIN		1
+#define SPI_SCK_PIN		6
 
 // CSN pin (Chip Select)
-#define SPI_CSN_PIN		3
+#define SPI_CSN_PIN		7
 
 #endif /* SPICONFIG_H_ */
