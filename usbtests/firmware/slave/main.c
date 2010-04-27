@@ -325,7 +325,7 @@ int main(void) {
 	PRINTF("done\n");
 
 	PRINTF("Initializing interrupts... ");
-	GICR |= 0x01 << INT2
+	GICR |= 0x01 << INT2;
 	MCUCSR |= 0x01 << ISC2;
 	SREG |= 0x01 << SREG_I;
 	sei();
