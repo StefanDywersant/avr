@@ -43,7 +43,6 @@ masterfw.hex: masterfw.elf
 	rm -f masterfw.hex masterfw.eep.hex
 	avr-objcopy -j .text -j .data -O ihex masterfw.elf masterfw.hex
 	avr-size masterfw.hex
-	echo "$(CC)"
 
 disasm:	masterfw.elf
 	avr-objdump -d masterfw.elf
