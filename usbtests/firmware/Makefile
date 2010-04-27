@@ -2,6 +2,14 @@ MAKE=make
 REMOTE_HOST=twarzromana.czystybeton.pl
 REMOTE_DIR=__avr
 
+all: masterfw.hex slavefw.hex
+
+masterfw.hex:
+	cd master && $(MAKE) hex
+
+slavefw.hex:
+	cd slave && $(MAKE) hex
+
 rmasterflash: rsync
 	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR); make clean masterflash"
 
