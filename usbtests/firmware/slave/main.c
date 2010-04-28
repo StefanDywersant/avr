@@ -297,6 +297,22 @@ uchar usbFunctionWrite(uchar *data, uchar len) {
 	return len;
 }
 
+void nrf905_print_tx(void) {
+	cli();
+	PORTA &= ~(0x01 << 5);
+	_delay_ms(250);
+	PRINTF("O KURWA!\n");
+	sei();
+}
+
+void nrf905_print_rx(void) {
+	cli();
+	PORTA |= 0x01 << 5;
+	_delay_ms(250);
+	PRINTF("CHUJ!\n");
+	sei();
+}
+
 int main(void) {
 	usart_init();
 	stdout = &usart_stdout;
@@ -304,6 +320,7 @@ int main(void) {
 	PRINTF("\n\n\nNapierdalator test board\n");
 
 	DDRB = 0xFF;
+	DDRA |= 0x01 << 5;
 
 	PRINTF("Initializing TWI... ");
 	twi_init();
@@ -326,6 +343,8 @@ int main(void) {
 
 	PRINTF("Initializing nrf905... ");
 	nrf905_init();
+	nrf905_set_packet_rx_callback(nrf905_print_rx);
+	nrf905_set_packet_tx_callback(nrf905_print_tx);
 	PRINTF("done\n");
 
 	odDebugInit();
