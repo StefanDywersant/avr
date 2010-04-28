@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <avr/io.h>
@@ -8,6 +7,7 @@
 #include "debug.h"
 #include "spi.h"
 #include "nrf905.h"
+#include "version.h"
 
 void txPacket(void) {
 	uint8_t payload[32];
@@ -29,6 +29,10 @@ void dupa2(void) {
 }
 
 int main(void) {
+	debug_init();
+
+	PRINTF("Sentinel");
+
 	DDRD = 0xFF;
 
 	PORTD = 0x01;

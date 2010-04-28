@@ -5,15 +5,20 @@
 #include <avr/wdt.h>
 #include <avr/io.h>
 #include <util/delay.h>
-#include "debug.h"
+
+// interfaces
 #include "owi.h"
 #include "spi.h"
 #include "twi.h"
-#include "usart.h"
-#include "oddebug.h"
+#include "usbdrv.h"
+
+// devices
 #include "nrf905.h"
 #include "pcf8583.h"
-#include "usbdrv.h"
+
+// debug
+#include "debug.h"
+
 
 PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must match usbconfig.h */
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
@@ -47,9 +52,6 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
 
 static char led = 0xff;
 static pcf8583_datetime_t time;
-//static uint8_t buf[9];
-
-FILE usart_stdout = FDEV_SETUP_STREAM(usart_put_char, NULL, _FDEV_SETUP_WRITE);
 
 void twiPlayground() {
 /*	uint8_t request[1];
@@ -314,8 +316,7 @@ void nrf905_print_rx(void) {
 }
 
 int main(void) {
-	usart_init();
-	stdout = &usart_stdout;
+	debug_init();
 
 	PRINTF("\n\n\nNapierdalator test board\n");
 
@@ -346,8 +347,6 @@ int main(void) {
 	nrf905_set_packet_rx_callback(nrf905_print_rx);
 	nrf905_set_packet_tx_callback(nrf905_print_tx);
 	PRINTF("done\n");
-
-	odDebugInit();
 
 	PRINTF("Entering main loop...\n\n");
 
