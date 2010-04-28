@@ -1,3 +1,11 @@
+/**
+ *
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>

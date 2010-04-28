@@ -1,9 +1,10 @@
-/*
- * spi.c
+/**
  *
- *  Created on: 2010-04-21
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #include <avr/io.h>
 #include <avr/interrupt.h>

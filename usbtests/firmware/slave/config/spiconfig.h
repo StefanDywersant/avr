@@ -1,8 +1,10 @@
 /**
- * spiconfig.h
- * 
+ *
+ *
  * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef SPICONFIG_H_
 #define SPICONFIG_H_

@@ -1,8 +1,10 @@
 /**
- * nrf905config.h
- * 
+ *
+ *
  * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef NRF905CONFIG_H_
 #define NRF905CONFIG_H_

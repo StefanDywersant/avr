@@ -1,3 +1,11 @@
+/**
+ *
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
+ */
+
+
 #include <stdlib.h>
 #include <avr/io.h>
 #include <util/delay.h>

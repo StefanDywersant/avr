@@ -1,9 +1,10 @@
-/*
- * usart.h
+/**
  *
- *  Created on: 2010-04-09
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef USART_H_
 #define USART_H_

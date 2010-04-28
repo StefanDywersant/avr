@@ -1,9 +1,10 @@
-/*
- * twi.h
+/**
  *
- *  Created on: 2010-03-27
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef TWI_H_
 #define TWI_H_

@@ -1,9 +1,10 @@
-/*
- * pcf8583.h
+/**
  *
- *  Created on: 2010-03-28
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef PCF8583_H_
 #define PCF8583_H_

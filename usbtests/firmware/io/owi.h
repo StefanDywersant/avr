@@ -1,9 +1,10 @@
-/*
- * 1wire.h
+/**
  *
- *  Created on: 2010-04-02
- *      Author: Karol Maciaszek
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef OWI_H_
 #define OWI_H_

@@ -1,7 +1,8 @@
 /**
- * twiconfig.h
- * 
+ *
+ *
  * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
 
 #ifndef TWICONFIG_H_

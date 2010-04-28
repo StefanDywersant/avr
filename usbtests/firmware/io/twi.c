@@ -1,3 +1,11 @@
+/**
+ *
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
+ */
+
+
 #include "twi.h"
 #include <util/twi.h>
 

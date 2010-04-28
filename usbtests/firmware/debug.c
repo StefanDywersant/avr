@@ -1,7 +1,8 @@
 /**
- * debug.c
- * 
+ *
+ *
  * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
 
 #include <stdio.h>

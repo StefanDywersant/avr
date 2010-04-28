@@ -1,9 +1,10 @@
-/*
- * spi.h
+/**
  *
- *  Created on: 2010-04-21
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef SPI_H_
 #define SPI_H_
