@@ -1,8 +1,8 @@
-/*
- * debug.h
+/**
  *
- *  Created on: 2010-04-24
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
 
 #ifndef DEBUG_H_

@@ -1,9 +1,10 @@
-/*
- * nrf905.h
+/**
  *
- *  Created on: 2010-04-22
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef NRF905_H_
 #define NRF905_H_

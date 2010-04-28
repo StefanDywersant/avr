@@ -1,8 +1,10 @@
 /**
- * usartconfig.h
- * 
+ *
+ *
  * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef USARTCONFIG_H_
 #define USARTCONFIG_H_

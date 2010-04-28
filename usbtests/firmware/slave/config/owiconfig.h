@@ -1,10 +1,10 @@
 /**
- * owiconfig.h
- * 
- * One Wire Interface Config
+ *
  *
  * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #ifndef OWICONFIG_H_
 #define OWICONFIG_H_

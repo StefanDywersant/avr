@@ -1,9 +1,10 @@
-/*
- * pcf8583.c
+/**
  *
- *  Created on: 2010-03-28
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #include <stdlib.h>
 #include "pcf8583.h"

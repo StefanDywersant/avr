@@ -1,9 +1,10 @@
-/*
- * usart.c
+/**
  *
- *  Created on: 2010-04-09
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #include <stdio.h>
 #include <stdlib.h>

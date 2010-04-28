@@ -1,9 +1,10 @@
-/*
- * nrf905.c
+/**
  *
- *  Created on: 2010-04-22
- *      Author: kharg
+ *
+ * @author Karol Maciaszek <karol.maciaszek@gmail.com>
+ * $Id$
  */
+
 
 #include <stdlib.h>
 #include "debug.h"
