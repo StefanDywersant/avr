@@ -1,7 +1,11 @@
 /**
+ * Sentinel
+ * Multi-aquarium controller.
  *
+ * Copyright: (c) 2010 by Karol Maciaszek
+ * E-mail   : <karol.maciaszek@gmail.com>
+ * WWW      : http://www.czystybeton.pl/
  *
- * @author Karol Maciaszek <karol.maciaszek@gmail.com>
  * $Id$
  */
 

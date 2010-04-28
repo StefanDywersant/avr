@@ -1,3 +1,14 @@
+#
+# Sentinel
+# Multi-aquarium controller.
+#
+# Copyright: (c) 2010 by Karol Maciaszek
+# E-mail   : <karol.maciaszek@gmail.com>
+# WWW      : http://www.czystybeton.pl/
+#
+# $Id$
+#
+
 CC      = avr-gcc
 DEVICE  = atmega16
 F_CPU   = 1000000

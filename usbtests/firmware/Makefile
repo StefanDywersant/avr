@@ -1,3 +1,14 @@
+#
+# Sentinel
+# Multi-aquarium controller.
+#
+# Copyright: (c) 2010 by Karol Maciaszek
+# E-mail   : <karol.maciaszek@gmail.com>
+# WWW      : http://www.czystybeton.pl/
+#
+# $Id$
+#
+
 MAKE=make
 REMOTE_HOST=twarzromana.czystybeton.pl
 REMOTE_DIR=__avr
