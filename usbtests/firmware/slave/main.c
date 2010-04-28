@@ -307,19 +307,15 @@ uchar usbFunctionWrite(uchar *data, uchar len) {
 }
 
 void nrf905_print_tx(void) {
-	cli();
 	PORTA &= ~(0x01 << 5);
 	_delay_ms(250);
-	PRINTF("O KURWA!\n");
-	sei();
+	PRINTF("nrf905_print_tx\n");
 }
 
 void nrf905_print_rx(void) {
-	cli();
 	PORTA |= 0x01 << 5;
 	_delay_ms(250);
-	PRINTF("CHUJ!\n");
-	sei();
+	PRINTF("nrf905_print_rx\n");
 }
 
 int main(void) {

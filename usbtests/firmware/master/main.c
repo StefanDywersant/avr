@@ -17,52 +17,54 @@
 #include "nrf905.h"
 #include "version.h"
 
-void txPacket(void) {
+static uint8_t seq = 0;
+
+void tx_packet(void) {
 	uint8_t payload[32];
 
 	uint8_t i;
 	for (i = 0; i < 32; i++)
-		payload[i] = i;
+		payload[i] = seq;
 
 	nrf905_tx_packet(0x12345678, 32, payload);
+
+	PRINTF("tx_packet; seq=%02x\n", seq);
+
+	seq++;
 }
 
 
-void dupa(void) {
-	PORTD = 0xff;
+void on_tx(void) {
+	PRINTF("on_tx\n");
 }
 
-void dupa2(void) {
-	PORTD = 0x00;
+void on_rx(void) {
+	PRINTF("on_rx\n");
 }
 
 int main(void) {
 	debug_init();
 
-	PRINTF("Sentinel");
-
 	DDRD = 0xFF;
 
-	PORTD = 0x01;
+	PRINTF("Sentinel Master Device, version %s\n", VERSION);
+
+	PRINTF("Initializing SPI... ");
 	spi_init();
-	PORTD = 0x02;
+	PRINTF("done.\n");
 
-	PORTD = 0x03;
+	PRINTF("Initializing NRF905... ");
 	nrf905_init();
+	nrf905_set_packet_tx_callback(on_tx);
+	nrf905_set_packet_rx_callback(on_rx);
+	PRINTF("done.\n");
 
+	PRINTF("Initializing interrupts... ");
 	sei();
-
-	nrf905_set_packet_tx_callback(dupa);
-	nrf905_set_packet_rx_callback(dupa2);
-
-	PORTD = 0x04;
-
-	uint8_t i = 0x05;
+	PRINTF("done.\n");
 
 	while (1) {
 		_delay_ms(1000);
-		PORTD = i++;
-		txPacket();
-
+		tx_packet();
 	}
 }
