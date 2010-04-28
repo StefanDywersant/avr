@@ -6,6 +6,7 @@
  */
 
 #include <stdlib.h>
+#include "debug.h"
 #include "spi.h"
 #include "nrf905.h"
 #include "nrf905config.h"
@@ -45,7 +46,9 @@
 // get TX_EN state
 #define GET_TX_EN					(OUTPORT(PORT) & (0x01 << TX_EN_PIN)) >> TX_EN_PIN
 
-static void (*receive_packet_callback)(void) = NULL;
+static void (*on_packet_rx)(void) = NULL;
+
+static void (*on_packet_tx)(void) = NULL;
 
 static uint8_t command_read(uint8_t cmd, uint8_t len, uint8_t* buf) {
 	uint8_t sr;
@@ -74,6 +77,7 @@ static uint8_t command_write(uint8_t cmd, uint8_t len, uint8_t* buf) {
 void nrf905_init(void) {
 	// setting up port
 	DDRPORT(PORT) |= (0x01 << TX_EN_PIN) | (0x01 << TRX_CE_PIN) | (0x01 << PWR_UP_PIN);
+	DDRPORT(PORT) &= ~(0x01 << DR_PIN);
 
 	// setting chip mode to standby
 	STANDBY();
@@ -174,17 +178,25 @@ uint8_t nrf905_get_status_register(void) {
 	return command_read(READ_CONFIG, 0, NULL);
 }
 
-void nrf905_set_receive_packet_callback(void (*receive_packet_callback)(void) func) {
-	receive_packet_callback =
+void nrf905_set_packet_rx_callback(void (*func)(void)) {
+	on_packet_rx = func;
+}
+
+void nrf905_set_packet_tx_callback(void (*func)(void)) {
+	on_packet_tx = func;
 }
 
 ISR(DR_INT_VECT) {
 	if (GET_TX_EN) {
 		// transmit complete
+		if (on_packet_tx != NULL)
+			on_packet_tx();
+
 		RX_PACKET();
 	} else {
 		// receive complete
-		receive_packet_callback();
+		if (on_packet_rx != NULL)
+			on_packet_rx();
 
 		RX_PACKET();
 	}

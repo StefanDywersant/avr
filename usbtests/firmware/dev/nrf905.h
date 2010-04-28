@@ -30,4 +30,9 @@ uint8_t nrf905_get_status_register(void);
 
 void nrf905_read_control_register(uint8_t* buf);
 
+void nrf905_set_packet_rx_callback(void (*func)(void));
+
+void nrf905_set_packet_tx_callback(void (*func)(void));
+
+
 #endif /* NRF905_H_ */
