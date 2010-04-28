@@ -14,6 +14,8 @@
 
 #define PRINTF(f, ...)		{ printf(f, ##__VA_ARGS__); }
 
+void debug_init(void);
+
 #else
 
 #define PRINTF(f, ...)		{ }
