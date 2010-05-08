@@ -31,7 +31,7 @@
 #define DR_INT_VECT			INT2_vect // DR interrupt vector name
 
 // Sets center frequency
-#define CH_NO				0x01fe
+#define CH_NO				0x0100
 
 // Sets PLL in 433 or 868/915MHz mode.
 #define HFREQ_PLL_OFF		0x00 << 1 // 433MHz
@@ -43,12 +43,12 @@
 #define PA_PWR_M_2			0x01 << 2 // -2dBm
 #define PA_PWR_P_6			0x02 << 2 // 6dBm
 #define PA_PWR_P_10			0x03 << 2 // 10dBm
-#define PA_PWR				PA_PWR_M_10
+#define PA_PWR				PA_PWR_P_10
 
 // Reduces current in RX mode by 1.6mA. Sensitivity is reduced.
 #define RX_RED_PWR_OFF		0x00 << 4 // normal operation
 #define RX_RED_PWR_ON		0x01 << 4 // reduced power
-#define RX_RED_PWR			RX_RED_PWR_ON
+#define RX_RED_PWR			RX_RED_PWR_OFF
 
 // Retransmit contents in TX register if TRX_CE and TXEN are high.
 #define AUTO_RETRAN_OFF		0x00 << 5 // no retransmission
