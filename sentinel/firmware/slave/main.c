@@ -31,7 +31,7 @@
 #include "debug.h"
 
 
-PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must match usbconfig.h */
+/*PROGMEM char usbHidReportDescriptor[52] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x02,                    // USAGE (Mouse)
     0xa1, 0x01,                    // COLLECTION (Application)
@@ -59,7 +59,7 @@ PROGMEM char usbHidReportDescriptor[52] = { /* USB report descriptor, size must 
     0x81, 0x06,                    //     INPUT (Data,Var,Rel)
     0xC0,                          //   END_COLLECTION
     0xC0,                          // END COLLECTION
-};
+};*/
 
 static char led = 0xff;
 static pcf8583_datetime_t time;
@@ -311,15 +311,22 @@ uchar usbFunctionWrite(uchar *data, uchar len) {
 }
 
 void nrf905_print_tx(void) {
-	PORTA &= ~(0x01 << 5);
-	_delay_ms(250);
 	PRINTF("nrf905_print_tx\n");
 }
 
 void nrf905_print_rx(void) {
-	PORTA |= 0x01 << 5;
-	_delay_ms(250);
+	uint8_t buf[32];
+	uint8_t i;
+
 	PRINTF("nrf905_print_rx\n");
+
+	nrf905_rx_packet(32, buf);
+
+	PRINTF(" RXPAYLOAD=0x");
+	for (i = 0; i < 32; i++)
+		PRINTF("%02x", buf[i]);
+	PRINTF("\n");
+
 }
 
 int main(void) {

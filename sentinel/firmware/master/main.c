@@ -49,7 +49,9 @@ void on_rx(void) {
 int main(void) {
 	debug_init();
 
-	DDRD = 0xFF;
+	DDRB = 0xff;
+
+	_delay_ms(1000);
 
 	PRINTF("Sentinel Master Device, version %s\n", VERSION);
 
@@ -68,7 +70,7 @@ int main(void) {
 	PRINTF("done.\n");
 
 	while (1) {
-		_delay_ms(1000);
+		_delay_ms(150);
 		tx_packet();
 	}
 }
