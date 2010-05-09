@@ -19,6 +19,7 @@
 #include "debug.h"
 #include "spi.h"
 #include "nrf905.h"
+#include "rc2.h"
 #include "version.h"
 
 static uint64_t seq = 0;
@@ -39,6 +40,8 @@ void tx_packet(void) {
 	payload[25] = (uint8_t)((seq & 0x00ff000000000000) >> 48);
 	payload[24] = (uint8_t)((seq & 0xff00000000000000) >> 56);
 
+	rc2_encrypt(32, payload);
+
 	nrf905_tx_packet(0x12345678, 32, payload);
 
 	PRINTF("tx_packet; seq=%016llx\n", seq);
@@ -56,6 +59,8 @@ void on_rx(void) {
 }
 
 int main(void) {
+	uint8_t key[8] = {0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
 	debug_init();
 
 	_delay_ms(1000);
@@ -71,6 +76,10 @@ int main(void) {
 	nrf905_set_packet_tx_callback(on_tx);
 	nrf905_set_packet_rx_callback(on_rx);
 	PRINTF("done.\n");
+
+	PRINTF("Initializing rc2 cipher... ");
+	rc2_set_key(key);
+	PRINTF("done\n");
 
 	PRINTF("Initializing interrupts... ");
 	sei();
