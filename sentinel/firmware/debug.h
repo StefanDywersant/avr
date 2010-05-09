@@ -13,10 +13,11 @@
 #define DEBUG_H_
 
 #include <stdio.h>
+#include <avr/pgmspace.h>
 
 #if DEBUG == 1
 
-#define PRINTF(f, ...)		{ printf(f, ##__VA_ARGS__); }
+#define PRINTF(f, ...)		{ printf_P(PSTR(f), ##__VA_ARGS__); }
 
 void debug_init(void);
 

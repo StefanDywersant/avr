@@ -21,18 +21,27 @@
 #include "nrf905.h"
 #include "version.h"
 
-static uint8_t seq = 0;
+static uint64_t seq = 0;
 
 void tx_packet(void) {
 	uint8_t payload[32];
 
 	uint8_t i;
 	for (i = 0; i < 32; i++)
-		payload[i] = seq;
+		payload[i] = 0;
+
+	payload[31] = (uint8_t)(seq & 0x00000000000000ff);
+	payload[30] = (uint8_t)((seq & 0x000000000000ff00) >> 8);
+	payload[29] = (uint8_t)((seq & 0x0000000000ff0000) >> 16);
+	payload[28] = (uint8_t)((seq & 0x00000000ff000000) >> 24);
+	payload[27] = (uint8_t)((seq & 0x000000ff00000000) >> 32);
+	payload[26] = (uint8_t)((seq & 0x0000ff0000000000) >> 40);
+	payload[25] = (uint8_t)((seq & 0x00ff000000000000) >> 48);
+	payload[24] = (uint8_t)((seq & 0xff00000000000000) >> 56);
 
 	nrf905_tx_packet(0x12345678, 32, payload);
 
-	PRINTF("tx_packet; seq=%02x\n", seq);
+	PRINTF("tx_packet; seq=%016llx\n", seq);
 
 	seq++;
 }
@@ -49,11 +58,9 @@ void on_rx(void) {
 int main(void) {
 	debug_init();
 
-	DDRB = 0xff;
-
 	_delay_ms(1000);
 
-	PRINTF("Sentinel Master Device, version %s\n", VERSION);
+	PRINTF("Sentinel Master Board, version %s\n", VERSION);
 
 	PRINTF("Initializing SPI... ");
 	spi_init();
@@ -70,7 +77,7 @@ int main(void) {
 	PRINTF("done.\n");
 
 	while (1) {
-		_delay_ms(150);
+		_delay_ms(1000);
 		tx_packet();
 	}
 }

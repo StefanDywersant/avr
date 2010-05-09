@@ -173,8 +173,11 @@ void nrf905_get_tx_payload(uint8_t* payload) {
 
 
 void nrf905_rx_packet(uint8_t len, uint8_t* payload) {
-	READ_RX();
+	STANDBY();
+
 	command_read(READ_RX_PAYLOAD, len, payload);
+
+	RX_PACKET();
 }
 
 
