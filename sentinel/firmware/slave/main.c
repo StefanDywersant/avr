@@ -365,7 +365,7 @@ void nrf905_print_rx(void) {
 	PRINTF(" DECRYPTED=0x");
 	for (i = 0; i < 32; i++)
 		PRINTF("%02x", buf[i]);
-	PRINTF("\n");
+	PRINTF("\n\n");
 }
 
 int main(void) {
