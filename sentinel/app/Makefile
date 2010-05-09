@@ -1,4 +1,13 @@
-USBFLAGS=`pkg-config --cflags libusb-1.0`
+# Sentinel
+# Multi-aquarium controller.
+#
+# Copyright: (c) 2010 by Karol Maciaszek
+# E-mail   : <karol.maciaszek@gmail.com>
+# WWW      : http://www.czystybeton.pl/
+#
+# $Id$
+  
+ USBFLAGS=`pkg-config --cflags libusb-1.0`
 USBLIBS=`pkg-config --libs libusb-1.0`
 
 CC=gcc
@@ -6,7 +15,7 @@ CFLAGS=-O -Wall $(USBFLAGS)
 LIBS=$(USBLIBS)
 
 OBJ=main.o
-PROGRAM=usbtests
+PROGRAM=sentinel
 
 all: $(PROGRAM)
 
