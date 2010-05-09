@@ -1,8 +1,12 @@
-/*
- * main.c
+/**
+ * Sentinel
+ * Multi-aquarium controller.
  *
- *  Created on: 2010-03-23
- *      Author: Karol Maciaszek
+ * Copyright: (c) 2010 by Karol Maciaszek
+ * E-mail   : <karol.maciaszek@gmail.com>
+ * WWW      : http://www.czystybeton.pl/
+ *
+ * $Id$
  */
 
 #include <stdlib.h>
@@ -107,22 +111,22 @@ int main(int argc, char** argv) {
 
 	int ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT, 0x04, 0 ,0, (unsigned char*)reqType, 1, 10000);
 
-	printf("Write: %d\n", ret);
+//	printf("Write: %d\n", ret);
 
-	unsigned char data[2];
-	ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN, 0x04, 0 ,0, data, 2, 10000);
+//	unsigned char data[2];
+//	ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN, 0x04, 0 ,0, data, 2, 10000);
 
 //	printf("Read: %d (%d, %04d/%02d/%02d %02d:%02d:%02d.%02d)\n", ret, data[7], data[6], data[5], data[4], data[3], data[2], data[1], data[0]);
-	char sign;
-	if (data[1] & 0xf8)
-		sign = '-';
-	else
-		sign = '+';
+//	char sign;
+//	if (data[1] & 0xf8)
+//		sign = '-';
+//	else
+//		sign = '+';
 
-	int temp = ((data[1] & 0x07) << 4) | (data[0] >> 4);
-	int htemp = (data[0] & 0x0f);
+//	int temp = ((data[1] & 0x07) << 4) | (data[0] >> 4);
+//	int htemp = (data[0] & 0x0f);
 
-	printf("Read temperature: %c%d.%d %d:%d\n", sign, temp, htemp, data[0], data[1]);
+//	printf("Read temperature: %c%d.%d %d:%d\n", sign, temp, htemp, data[0], data[1]);
 
 	libusb_close(handle);
 
