@@ -33,6 +33,10 @@ void nrf905_get_tx_payload(uint8_t* payload);
 
 uint8_t nrf905_get_status_register(void);
 
+void nrf905_enable_rx(void);
+
+void nrf905_disable_rx(void);
+
 void nrf905_read_control_register(uint8_t* buf);
 
 void nrf905_set_packet_rx_callback(void (*func)(void));
