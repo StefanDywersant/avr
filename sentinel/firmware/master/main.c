@@ -23,6 +23,7 @@
 #include "version.h"
 
 static uint64_t seq = 0;
+static uint8_t free_to_tx = 0x1;
 
 void tx_packet(void) {
 	uint8_t payload[32];
@@ -52,6 +53,7 @@ void tx_packet(void) {
 
 void on_tx(void) {
 	PRINTF("on_tx\n");
+	free_to_tx = 0x1;
 }
 
 void on_rx(void) {
@@ -86,7 +88,9 @@ int main(void) {
 	PRINTF("done.\n");
 
 	while (1) {
-		_delay_ms(1000);
-		tx_packet();
+		if (free_to_tx) {
+			free_to_tx = 0x0;
+			tx_packet();
+		}
 	}
 }

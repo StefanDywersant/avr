@@ -347,6 +347,8 @@ void nrf905_print_tx(void) {
 	PRINTF("nrf905_print_tx\n");
 }
 
+static uint8_t sq = 0;
+
 void nrf905_print_rx(void) {
 	uint8_t buf[32];
 	uint8_t i;
@@ -397,17 +399,17 @@ int main(void) {
 	sei();
 	PRINTF("done\n");
 
+	PRINTF("Initializing rc2 cipher... ");
+	rc2_set_key(key);
+	PRINTF("done\n");
+
 	PRINTF("Initializing nrf905... ");
 	nrf905_init();
 	nrf905_set_packet_rx_callback(nrf905_print_rx);
 	nrf905_set_packet_tx_callback(nrf905_print_tx);
 	PRINTF("done\n");
 
-	PRINTF("Initializing rc2 cipher... ");
-	rc2_set_key(key);
-	PRINTF("done\n");
-
-	PRINTF("Entering main loop...\n\n");
+	nrf905_enable_rx();
 
 	while (1) {
 		usbPoll();

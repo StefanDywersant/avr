@@ -186,6 +186,14 @@ uint8_t nrf905_get_status_register(void) {
 	return command_read(READ_CONFIG, 0, NULL);
 }
 
+void nrf905_enable_rx(void) {
+	RX_PACKET();
+}
+
+void nrf905_disable_rx(void) {
+	STANDBY();
+}
+
 void nrf905_set_packet_rx_callback(void (*func)(void)) {
 	on_packet_rx = func;
 }
