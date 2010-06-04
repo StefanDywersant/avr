@@ -27,6 +27,9 @@ rmasterflash: rsync
 rslaveflash: rsync
 	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR); make clean slaveflash"
 
+rslavefuse: rsync
+	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR); make slavefuse"
+
 rsync:
 	ssh $(REMOTE_HOST) "mkdir -p $(REMOTE_DIR)" || exit 1
 	rsync --rsh=ssh -r * $(REMOTE_HOST):$(REMOTE_DIR) || exit 1
@@ -36,6 +39,9 @@ masterflash:
 
 slaveflash:
 	cd slave && $(MAKE) flash
+
+slavefuse:
+	cd slave && $(MAKE) fuse
 
 clean: masterclean slaveclean
 
