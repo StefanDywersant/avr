@@ -19,6 +19,7 @@
 
 // interfaces
 #include "owi.h"
+#include "rfproto.h"
 #include "spi.h"
 #include "twi.h"
 #include "usbdrv.h"
@@ -410,6 +411,43 @@ int main(void) {
 	PRINTF("done\n");
 
 	nrf905_enable_rx();
+
+	uint8_t payload[30];
+	payload[0] = 0x00;
+	payload[1] = 0x00;
+	payload[2] = 0x00;
+	payload[3] = 0x00;
+	payload[4] = 0x00;
+	payload[5] = 0x00;
+	payload[6] = 0x00;
+	payload[7] = 0x00;
+	payload[8] = 0x00;
+	payload[9] = 0x00;
+	payload[10] = 0x00;
+	payload[11] = 0x00;
+	payload[12] = 0x00;
+	payload[13] = 0x00;
+	payload[14] = 0x00;
+	payload[15] = 0x00;
+	payload[16] = 0x00;
+	payload[17] = 0x00;
+	payload[18] = 0x00;
+	payload[19] = 0x00;
+	payload[20] = 0x00;
+	payload[21] = 0x00;
+	payload[22] = 0x00;
+	payload[23] = 0x00;
+	payload[24] = 0x00;
+	payload[25] = 0x00;
+	payload[26] = 0x00;
+	payload[27] = 0x00;
+	payload[28] = 0x00;
+	payload[29] = 0x00;
+
+
+	uint8_t i;
+	for (i = 0; i < 255; i++)
+		rfproto_async_tx(30, payload);
 
 	while (1) {
 		usbPoll();
