@@ -20,10 +20,10 @@
 #include "spi.h"
 #include "nrf905.h"
 #include "rc2.h"
+#include "rfproto.h"
 #include "version.h"
 
 static uint64_t seq = 0;
-static uint8_t free_to_tx = 0x1;
 
 void tx_packet(void) {
 	uint8_t payload[32];
@@ -32,16 +32,18 @@ void tx_packet(void) {
 	for (i = 0; i < 32; i++)
 		payload[i] = 0;
 
-	payload[31] = (uint8_t)(seq & 0x00000000000000ff);
-	payload[30] = (uint8_t)((seq & 0x000000000000ff00) >> 8);
-	payload[29] = (uint8_t)((seq & 0x0000000000ff0000) >> 16);
-	payload[28] = (uint8_t)((seq & 0x00000000ff000000) >> 24);
-	payload[27] = (uint8_t)((seq & 0x000000ff00000000) >> 32);
-	payload[26] = (uint8_t)((seq & 0x0000ff0000000000) >> 40);
-	payload[25] = (uint8_t)((seq & 0x00ff000000000000) >> 48);
-	payload[24] = (uint8_t)((seq & 0xff00000000000000) >> 56);
+	payload[0] = (uint8_t)(seq & 0x00000000000000ff);
+	payload[1] = (uint8_t)((seq & 0x000000000000ff00) >> 8);
+	payload[2] = (uint8_t)((seq & 0x0000000000ff0000) >> 16);
+	payload[3] = (uint8_t)((seq & 0x00000000ff000000) >> 24);
+	payload[4] = (uint8_t)((seq & 0x000000ff00000000) >> 32);
+	payload[5] = (uint8_t)((seq & 0x0000ff0000000000) >> 40);
+	payload[6] = (uint8_t)((seq & 0x00ff000000000000) >> 48);
+	payload[7] = (uint8_t)((seq & 0xff00000000000000) >> 56);
 
 	rc2_encrypt(32, payload);
+
+	rfproto_async_tx(8, payload);
 
 	nrf905_tx_packet(0x12345678, 32, payload);
 
@@ -53,7 +55,6 @@ void tx_packet(void) {
 
 void on_tx(void) {
 	PRINTF("on_tx\n");
-	free_to_tx = 0x1;
 }
 
 void on_rx(void) {
@@ -87,10 +88,13 @@ int main(void) {
 	sei();
 	PRINTF("done.\n");
 
+	DDRC = 0xff;
+
 	while (1) {
-		if (free_to_tx) {
-			free_to_tx = 0x0;
-			tx_packet();
-		}
+		tx_packet();
+		_delay_ms(500);
+		PORTC = 0xff;
+		_delay_ms(500);
+		PORTC = 0x00;
 	}
 }

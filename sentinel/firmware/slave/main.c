@@ -34,7 +34,7 @@
 #include "debug.h"
 
 
-/*PROGMEM char usbHidReportDescriptor[52] = {
+PROGMEM char usbHidReportDescriptor[52] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x02,                    // USAGE (Mouse)
     0xa1, 0x01,                    // COLLECTION (Application)
@@ -62,7 +62,7 @@
     0x81, 0x06,                    //     INPUT (Data,Var,Rel)
     0xC0,                          //   END_COLLECTION
     0xC0,                          // END COLLECTION
-};*/
+};
 
 static char led = 0xff;
 static pcf8583_datetime_t time;
