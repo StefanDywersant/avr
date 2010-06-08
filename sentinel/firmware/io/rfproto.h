@@ -15,6 +15,8 @@
 
 #include <stdint.h>
 
-void rfproto_async_tx(uint8_t len, uint8_t* payload);
+void rfproto_async_tx(uint8_t len, uint8_t* msg, uint8_t type);
+
+uint8_t rfproto_rx(uint8_t len, uint8_t* msg, uint8_t* type);
 
 #endif /* RFPROTO_H_ */
