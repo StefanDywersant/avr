@@ -17,8 +17,8 @@ FUSE_H  = 0x99
 PROG_ID = bsd
 AVRDUDE = avrdude -c $(PROG_ID) -p $(DEVICE)
 
-CFLAGS  = -I. -Iio -Iutil -DDEBUG=1
-OBJECTS = main.o io/usart.o util/debug.o
+CFLAGS  = -I. -Iconfig -Idev -Iio -Iutil -DDEBUG=1
+OBJECTS = main.o io/usart.o dev/rgbled.o util/debug.o
 
 COMPILE = $(CC) -Wall -Os -DF_CPU=$(F_CPU) $(CFLAGS) -mmcu=$(DEVICE)
 

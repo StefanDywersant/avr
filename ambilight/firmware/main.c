@@ -12,13 +12,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// debug
+#include "rgbled.h"
 #include "debug.h"
 
 int main(void) {
-	PRINTF("\nAmbilight Board\n");
+	PRINTF("\nAmbilight - firmware\n");
+
+	PRINTF("Inicjalizacja bufora ed... ");
+	rgbled_init();
+	PRINTF("ok\n");
+
+	PRINTF("Pętla główna\n");
 
 	while (1) {
-		usbPoll();
+		rgbled_refresh();
 	}
 }
