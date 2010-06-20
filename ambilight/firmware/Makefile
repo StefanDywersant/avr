@@ -10,10 +10,10 @@
 #
 
 CC      = avr-gcc
-DEVICE  = atmega16
-F_CPU   = 1000000
-FUSE_L  = 0xE1
-FUSE_H  = 0x99
+DEVICE  = atmega32
+F_CPU   = 20000000
+FUSE_L  = 0xEF
+FUSE_H  = 0x89
 PROG_ID = bsd
 AVRDUDE = avrdude -c $(PROG_ID) -p $(DEVICE)
 
