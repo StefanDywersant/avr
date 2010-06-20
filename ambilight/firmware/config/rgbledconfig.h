@@ -13,25 +13,46 @@
 #ifndef RGBLEDCONFIG_H_
 #define RGBLEDCONFIG_H_
 
-#define LEDS_COUNT		2 // liczba diód
+#include <avr/io.h>
 
-#define SETUP_PORTS()	{\
-							led_states[0].r_port = PORTA;\
-							led_states[0].r_pin = 0;\
-							led_states[0].g_port = PORTA;\
-							led_states[0].g_pin = 1;\
-							led_states[0].b_port = PORTA;\
-							led_states[0].b_pin = 2;\
-							\
-							led_states[1].r_port = PORTA;\
-							led_states[1].r_pin = 3;\
-							led_states[1].g_port = PORTA;\
-							led_states[1].g_pin = 4;\
-							led_states[1].b_port = PORTA;\
-							led_states[1].b_pin = 5;\
-						}
+#define LEDS_COUNT		1		// liczba diód
+#define FREQ			50		// częstotliwość podstawowa diody led (realna częstotliwość jest iloczynem wraz z liczbą poziomów wypełnienia)
+#define FILL_LEVELS		100		// liczba poziomów wypełnienia poszczególnej składowej
 
-#define FREQ			50 // częstotliwość podstawowa diody led (realna częstotliwość jest iloczynem wraz z liczbą poziomów wypełnienia)
-#define FILL_LEVELS		5  // liczba poziomów wypełnienia poszczególnej składowej
+// mapa portów/pinów dla linii danych
+#define D0_PORT			C
+#define D0_PIN			0
+#define D1_PORT			C
+#define D1_PIN			1
+#define D2_PORT			C
+#define D2_PIN			2
+#define D3_PORT			C
+#define D3_PIN			3
+#define D4_PORT			C
+#define D4_PIN			4
+#define D5_PORT			C
+#define D5_PIN			5
+#define D6_PORT			C
+#define D6_PIN			6
+#define D7_PORT			C
+#define D7_PIN			7
+
+// mapa portów/pinów dla linii adresowych
+#define A0_PORT			A
+#define A0_PIN			0
+#define A1_PORT			A
+#define A1_PIN			1
+#define A2_PORT			A
+#define A2_PIN			2
+#define A3_PORT			A
+#define A3_PIN			3
+#define A4_PORT			A
+#define A4_PIN			4
+#define A5_PORT			A
+#define A5_PIN			5
+#define A6_PORT			A
+#define A6_PIN			6
+#define A7_PORT			A
+#define A7_PIN			7
 
 #endif /* RGBLEDCONFIG_H_ */

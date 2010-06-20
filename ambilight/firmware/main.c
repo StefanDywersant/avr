@@ -11,20 +11,38 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <util/delay.h>
 
 #include "rgbled.h"
 #include "debug.h"
 
+
 int main(void) {
+	rgbled_colour* colour;
+
+	colour = (rgbled_colour*)malloc(sizeof(rgbled_colour));
+
+	debug_init();
+
 	PRINTF("\nAmbilight - firmware\n");
 
-	PRINTF("Inicjalizacja bufora ed... ");
+	PRINTF("Inicjalizacja bufora led... ");
 	rgbled_init();
 	PRINTF("ok\n");
 
-	PRINTF("Pętla główna\n");
+	colour->r = 200;
+	colour->g = 0;
+	colour->b = 0;
+
+	rgbled_set_colour(0, colour);
+
+	PRINTF("Petla glowna\n");
 
 	while (1) {
 		rgbled_refresh();
+//		colour->r++;
+		rgbled_set_colour(0, colour);
 	}
+
+	return 0;
 }
