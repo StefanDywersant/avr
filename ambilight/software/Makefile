@@ -9,13 +9,14 @@
   
 USBFLAGS=`pkg-config --cflags libusb-1.0`
 USBLIBS=`pkg-config --libs libusb-1.0`
+X11LIBS=`pkg-config --libs x11`
 
 CC=gcc
 CFLAGS=-O -Wall $(USBFLAGS)
-LIBS=$(USBLIBS)
+LIBS=$(USBLIBS) $(X11LIBS)
 
 OBJ=main.o
-PROGRAM=sentinel
+PROGRAM=ambilight
 
 all: $(PROGRAM)
 
