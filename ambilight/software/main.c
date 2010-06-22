@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <libusb-1.0/libusb.h>
+#include <X11/Xlib.h>
 
 #define DEV_VENDOR_ID 0x16c0
 #define DEV_PRODUCT_ID 0x03e8
@@ -86,8 +87,16 @@ int get_device(libusb_device_handle** handle) {
 	return -1;
 }
 
+void get_image(void) {
+	Display *display = XOpenDisplay(NULL);
+	XImage *image = XGetImage(display, XDefaultRootWindow(display), 0, 0, 100, 100, AllPlanes, ZPixmap);
+	XCloseDisplay(display);
+}
+
 int main(int argc, char** argv) {
 	libusb_device_handle* handle;
+
+	get_image();
 
 	libusb_init(NULL);
 
@@ -96,20 +105,36 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 
-	if (argc != 2) {
-		printf("Wrong parameter count\n");
+	if (argc != 4) {
+		printf("Wrong parameter count (%d)\n", argc);
 		return 0;
 	}
 
-	unsigned int reqType[1];
-	if (sscanf(argv[1], "0x%02x", reqType) == 0) {
+	unsigned char reqType[3];
+	unsigned int r, g, b;
+
+	if (sscanf(argv[1], "0x%02x", &r) == 0) {
 		printf("Invalid hex value\n");
 		return 0;
 	}
 
-	printf("%d\n", reqType[0]);
+	if (sscanf(argv[2], "0x%02x", &g) == 0) {
+		printf("Invalid hex value\n");
+		return 0;
+	}
 
-	int ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT, 0x04, 0 ,0, (unsigned char*)reqType, 1, 10000);
+	if (sscanf(argv[3], "0x%02x", &b) == 0) {
+		printf("Invalid hex value\n");
+		return 0;
+	}
+
+	reqType[0] = (unsigned char)r;
+	reqType[1] = (unsigned char)g;
+	reqType[2] = (unsigned char)b;
+
+	printf("r=%d g=%d b=%d\n", reqType[0], reqType[1], reqType[2]);
+
+	int ret = libusb_control_transfer(handle, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT, 0x04, 0 ,0, reqType, 3, 10000);
 
 //	printf("Write: %d\n", ret);
 
