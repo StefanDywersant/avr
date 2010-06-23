@@ -13,7 +13,7 @@ X11LIBS=`pkg-config --libs x11`
 
 CC=gcc
 CFLAGS=-O -Wall $(USBFLAGS)
-LIBS=$(USBLIBS) $(X11LIBS)
+LIBS=$(USBLIBS) $(X11LIBS) -lgd
 
 OBJ=main.o
 PROGRAM=ambilight

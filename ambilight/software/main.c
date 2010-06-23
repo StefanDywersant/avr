@@ -14,6 +14,7 @@
 #include <string.h>
 #include <libusb-1.0/libusb.h>
 #include <X11/Xlib.h>
+#include <gd.h>
 
 #define DEV_VENDOR_ID 0x16c0
 #define DEV_PRODUCT_ID 0x03e8
@@ -88,9 +89,25 @@ int get_device(libusb_device_handle** handle) {
 }
 
 void get_image(void) {
+	int i, j;
+	gdImagePtr im;
 	Display *display = XOpenDisplay(NULL);
 	XImage *image = XGetImage(display, XDefaultRootWindow(display), 0, 0, 100, 100, AllPlanes, ZPixmap);
 	XCloseDisplay(display);
+
+	im = gdImageCreateTrueColor(100, 100);
+	
+	for (i = 0; i < 100; i++) {
+		for (j = 0; j < 100; j++) {
+			gdImageSetPixel(im, i, j, image->f.get_pixel(image, i, j));
+		}
+
+	}
+
+	FILE* dupa = fopen("dupsko.png", "wb");
+
+	gdImagePng(im, dupa);
+
 }
 
 int main(int argc, char** argv) {
