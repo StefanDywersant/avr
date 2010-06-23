@@ -15,9 +15,8 @@
 
 #include <avr/io.h>
 
-#define LEDS_COUNT		1		// liczba diód
-#define FREQ			50		// częstotliwość podstawowa diody led (realna częstotliwość jest iloczynem wraz z liczbą poziomów wypełnienia)
-#define FILL_LEVELS		100		// liczba poziomów wypełnienia poszczególnej składowej
+#define LEDS_COUNT		20		// liczba diód
+#define FILL_LEVELS		50		// liczba poziomów wypełnienia poszczególnej składowej
 
 // mapa portów/pinów dla linii danych
 #define D0_PORT			C
