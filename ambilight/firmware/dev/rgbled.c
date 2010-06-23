@@ -22,7 +22,6 @@
 #define DDRPORT(name)				CONCAT(DDR, name)
 
 #define GET_FILLED_CYCLES_COUNT(component)		FILL_LEVELS * component / 0xff
-#define CYCLE_DELAY								1000000l / (FREQ * FILL_LEVELS)
 #define LED_ADDR_PIN(no, col)					(uint8_t)(no * 3 + col) / 8
 #define LED_DATA_PIN(no, col)					(uint8_t)(no * 3 + col) - LED_ADDR_PIN(no, col) * 8
 
@@ -36,6 +35,7 @@ typedef struct {
 
 static led_state* led_states;
 
+static void (*refresh_func)(void);
 
 static void set_data_pin(uint8_t data_pin, uint8_t value) {
 	switch (data_pin) {
@@ -146,7 +146,9 @@ void rgbled_refresh() {
 		uint8_t led_no = 0;
 		uint8_t comp_no = 0;
 		while (1) {
-			if (data_pin == 8 || (addr_pin * 8 + data_pin) == (LEDS_COUNT - 1) * 8 + 2) {
+			refresh_func();
+
+			if (data_pin == 8 || (addr_pin * 8 + data_pin) == LEDS_COUNT * 3) {
 				set_clock(addr_pin);
 				data_pin = 0;
 				addr_pin++;
@@ -160,8 +162,6 @@ void rgbled_refresh() {
 			if (led_no >= LEDS_COUNT)
 				break;
 
-//			PRINTF("led_no=%d addr_pin=%d data_pin=%d\n", led_no, addr_pin, data_pin);
-
 			if (comp_no == 0) {
 				if (i >= led_states[led_no].r_cycles)
 					set_data_pin(data_pin, 0x01);
@@ -172,7 +172,7 @@ void rgbled_refresh() {
 					set_data_pin(data_pin, 0x01);
 				else
 					set_data_pin(data_pin, 0x00);
-			} else {
+			} else if (comp_no == 2) {
 				if (i >= led_states[led_no].b_cycles)
 					set_data_pin(data_pin, 0x01);
 				else
@@ -186,8 +186,11 @@ void rgbled_refresh() {
 }
 
 
-void rgbled_init() {
+void rgbled_init(void (*func)(void)) {
+	refresh_func = func;
+
 	led_states = (led_state*)malloc(LEDS_COUNT * sizeof(led_state));
+
 	DDRPORT(A0_PORT) |= 0x01 << A0_PIN;
 	OUTPORT(A0_PORT) &= ~(0x01 << A0_PIN);
 	DDRPORT(A1_PORT) |= 0x01 << A1_PIN;
