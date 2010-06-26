@@ -1,5 +1,5 @@
-# Ambilight
-# Aktywne podświetlenie monitora.
+# Ambilight Project
+# Console library test
 #
 # Copyright: (c) 2010 by Karol Maciaszek
 # E-mail   : <karol.maciaszek@gmail.com>
@@ -12,8 +12,8 @@ USBLIBS=`pkg-config --libs libusb-1.0`
 X11LIBS=`pkg-config --libs x11`
 
 CC=gcc
-CFLAGS=-O -Wall $(USBFLAGS)
-LIBS=$(USBLIBS) $(X11LIBS) -lgd
+CFLAGS=-O -Wall $(USBFLAGS) -I/usr/local/include
+LIBS=$(USBLIBS) $(X11LIBS) -lgd -lambilight
 
 OBJ=main.o
 PROGRAM=ambilight
@@ -30,4 +30,4 @@ clean:
 	rm -f $(OBJ) $(PROGRAM)
 
 .c.o:
-	$(CC) $(ARCH_COMPILE) $(CFLAGS) -c $*.c -o $*.o
+	$(CC) -fPIC $(CFLAGS) -c $*.c -o $*.o
