@@ -14,18 +14,18 @@
 #define SPI_H_
 
 #include <avr/io.h>
-#include "spiconfig.h"
+#include "softspiconfig.h"
 
-void spi_init();
+void softspi_init();
 
-void spi_begin();
+void softspi_begin();
 
-void spi_end();
+void softspi_end();
 
-uint8_t spi_read_write_byte(uint8_t byte);
+uint8_t softspi_read_write_byte(uint8_t byte);
 
-void spi_read_data(uint8_t len, uint8_t* data);
+void softspi_read_data(uint8_t len, uint8_t* data);
 
-void spi_write_data(uint8_t len, uint8_t* data);
+void softspi_write_data(uint8_t len, uint8_t* data);
 
 #endif /* SPI_H_ */
