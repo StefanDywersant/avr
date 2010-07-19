@@ -30,9 +30,9 @@
 #define DDR_SETUP()			{ \
 									DDRPORT(SOFTSPI_PORT) |= (0x01 << SOFTSPI_MOSI_PIN) | (0x01 << SOFTSPI_SCK_PIN) | (0x01 << SOFTSPI_CSN_PIN); \
 									DDRPORT(SOFTSPI_PORT) &= ~(0x01 << SOFTSPI_MISO_PIN); \
-								}
+							}
 
-#define WAIT()				{ _delay_us(SPI_FREQ / 1000); }
+#define WAIT()				{ _delay_us(SOFTSPI_FREQ / 1000); }
 
 
 void softspi_init() {
